@@ -1,0 +1,69 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: #0a0a0a;
+    --surface: #111111;
+    --surface-elevated: #1a1a1a;
+    --border: #222222;
+    --border-hover: #333333;
+    --primary: #4CAF50;
+    --primary-hover: #45a049;
+    --red: #ff5555;
+    --amber: #ffaa33;
+    --green: #55ff88;
+    --blue: #5599ff;
+    --purple: #cc66ff;
+    --muted: #888888;
+    --text-primary: #ffffff;
+    --text-secondary: #cccccc;
+  }
+
+  body {
+    @apply bg-background text-text-primary antialiased;
+  }
+}
+
+@layer components {
+  .rank-badge {
+    @apply inline-block px-2.5 py-0.5 rounded-lg font-bold text-[10px] uppercase tracking-wider;
+  }
+  .rank-beginner {
+    @apply bg-red/10 text-red border border-red;
+  }
+  .rank-developing {
+    @apply bg-amber/10 text-amber border border-amber;
+  }
+  .rank-proficient {
+    @apply bg-green/10 text-green border border-green;
+  }
+  .rank-advanced {
+    @apply bg-blue/10 text-blue border border-blue;
+  }
+  .rank-master {
+    @apply bg-purple/10 text-purple border border-purple;
+  }
+  .dashboard-card {
+    @apply bg-gradient-to-br from-surface to-surface-elevated border border-border rounded-2xl p-5;
+  }
+  .topic-card {
+    @apply bg-gradient-to-br from-surface to-surface-elevated border border-border rounded-xl p-5 cursor-pointer transition-all hover:border-primary hover:-translate-y-0.5 hover:shadow-lg hover:shadow-primary/10;
+  }
+  .weak-topic-card {
+    @apply bg-gradient-to-br from-red/5 to-red/10 border border-red/20 rounded-xl p-4 transition-all hover:border-red;
+  }
+  .btn-primary {
+    @apply bg-primary hover:bg-primary-hover text-white font-semibold rounded-xl px-4 py-2.5 transition-all;
+  }
+  .btn-secondary {
+    @apply bg-surface hover:bg-surface-elevated text-text-secondary font-semibold rounded-xl px-4 py-2.5 border border-border transition-all;
+  }
+  .progress-bar-bg {
+    @apply bg-border rounded-lg h-2 overflow-hidden;
+  }
+  .progress-bar-fill {
+    @apply h-full rounded-lg transition-all duration-500;
+  }
+}
