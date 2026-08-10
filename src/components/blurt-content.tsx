@@ -31,7 +31,7 @@ export default function BlurtContent({ userId, topic, subtopic }: { userId: stri
         .order("created_at", { ascending: false });
       setHistory(data || []);
       if (data && data[0]) {
-        setManualRag(data[0].manual_rag);
+        setManualRag((data[0] as any).manual_rag);
       }
     }
     load();

@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # BioBlurt
 
 Active Recall + Spec Tracker for AQA A-Level Biology. Built with Next.js 14 + Supabase.
@@ -39,3 +40,7 @@ Active Recall + Spec Tracker for AQA A-Level Biology. Built with Next.js 14 + Su
 - 🔍 Search spec points
 - 📈 Score history per subtopic
 - 🎯 Recommended review (weak topics)
+=======
+# Bioblurt-platform
+AQA Biology active recall tool
+>>>>>>> bfbc42283d23b738c706d347bebe007633ee2b8f
