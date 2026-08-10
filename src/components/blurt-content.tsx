@@ -51,7 +51,7 @@ export default function BlurtContent({ userId, topic, subtopic }: { userId: stri
       blurt_text: text,
       matched_points: res.matched,
       manual_rag: manualRag,
-    });
+    }as any);
 
     setSaving(false);
     setHistory((prev) => [{ score: res.score, manual_rag: manualRag, created_at: new Date().toISOString() }, ...prev]);
