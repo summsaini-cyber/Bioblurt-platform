@@ -19,7 +19,7 @@ Active Recall + Spec Tracker for AQA A-Level Biology. Built with Next.js 14 + Su
 3. **Run locally**
    ```bash
    npm run dev
-   ```
+   ```. 
    Open [http://localhost:3000](http://localhost:3000)
 
 ## Deploy
