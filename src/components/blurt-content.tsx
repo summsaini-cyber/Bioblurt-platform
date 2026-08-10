@@ -51,7 +51,7 @@ export default function BlurtContent({ userId, topic, subtopic }: { userId: stri
       blurt_text: text,
       matched_points: res.matched,
       manual_rag: manualRag,
-    }as any);
+    } as any);
 
     setSaving(false);
     setHistory((prev) => [{ score: res.score, manual_rag: manualRag, created_at: new Date().toISOString() }, ...prev]);
@@ -64,7 +64,7 @@ export default function BlurtContent({ userId, topic, subtopic }: { userId: stri
     if (history.length > 0) {
       await supabase
         .from("blurts")
-        .update({ manual_rag: newRag })
+        .update({ manual_rag: newRag } as any)
         .eq("user_id", userId)
         .eq("topic", topic)
         .eq("subtopic", subtopic)
@@ -137,7 +137,7 @@ export default function BlurtContent({ userId, topic, subtopic }: { userId: stri
             <div className="grid grid-cols-2 gap-6">
               <div className="text-center">
                 <div className={`text-6xl font-extrabold ${color === "red" ? "text-red" : color === "amber" ? "text-amber" : "text-green"}`}>
-                  {displayScore}%
+                    {displayScore}%
                 </div>
                 <div className="mt-2">
                   <span className={`rank-badge ${className}`}>{rank}</span>
@@ -187,10 +187,10 @@ export default function BlurtContent({ userId, topic, subtopic }: { userId: stri
                 {specPoints.map((point) => {
                   const isMatched = result.matched.includes(point);
                   return (
-                    <div
-                      key={point.slice(0, 30)}
-                      className={`flex items-start gap-3 p-3 rounded-lg ${isMatched ? "bg-green/5 border border-green/20" : "bg-red/5 border border-red/20"}`}
-                    >
+                      <div
+                        key={point.slice(0, 30)}
+                        className={`flex items-start gap-3 p-3 rounded-lg ${isMatched ? "bg-green/5 border border-green/20" : "bg-red/5 border border-red/20"}`}
+                      >
                       {isMatched ? (
                         <CheckCircle className="w-5 h-5 text-green shrink-0 mt-0.5" />
                       ) : (
