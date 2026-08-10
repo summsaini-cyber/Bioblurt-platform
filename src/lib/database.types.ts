@@ -1,93 +1,83 @@
-export type Database = {
+export type Json =
+  | string
+  | number
+  | boolean
+  | null
+  | { [key: string]: Json | undefined }
+  | Json[]
+
+export interface Database {
   public: {
     Tables: {
-      profiles: {
-        Row: {
-          id: string;
-          username: string | null;
-          created_at: string;
-        };
-        Insert: {
-          id: string;
-          username?: string | null;
-          created_at?: string;
-        };
-        Update: {
-          id?: string;
-          username?: string | null;
-          created_at?: string;
-        };
-      };
       blurts: {
         Row: {
-          id: string;
-          user_id: string;
-          topic: string;
-          subtopic: string;
-          score: number;
-          blurt_text: string;
-          matched_points: string[];
-          manual_rag: string | null;
-          created_at: string;
-        };
+          id: number
+          user_id: string
+          topic: string
+          subtopic: string
+          score: number
+          blurt_text: string
+          matched_points: string[]
+          manual_rag: string | null
+          created_at: string
+        }
         Insert: {
-          id?: string;
-          user_id: string;
-          topic: string;
-          subtopic: string;
-          score: number;
-          blurt_text: string;
-          matched_points?: string[];
-          manual_rag?: string | null;
-          created_at?: string;
-        };
+          id?: number
+          user_id: string
+          topic: string
+          subtopic: string
+          score: number
+          blurt_text: string
+          matched_points: string[]
+          manual_rag?: string | null
+          created_at?: string
+        }
         Update: {
-          id?: string;
-          user_id?: string;
-          topic?: string;
-          subtopic?: string;
-          score?: number;
-          blurt_text?: string;
-          matched_points?: string[];
-          manual_rag?: string | null;
-          created_at?: string;
-        };
-      };
-      tracker_points: {
+          id?: number
+          user_id?: string
+          topic?: string
+          subtopic?: string
+          score?: number
+          blurt_text?: string
+          matched_points?: string[]
+          manual_rag?: string | null
+          created_at?: string
+        }
+        Relationships: []
+      }
+      profiles: {
         Row: {
-          id: string;
-          user_id: string;
-          topic: string;
-          subtopic: string;
-          point_text: string;
-          point_key: string;
-          rag: string;
-          notes: string;
-          updated_at: string;
-        };
+          id: string
+          email: string
+          full_name: string | null
+          avatar_url: string | null
+          created_at: string
+        }
         Insert: {
-          id?: string;
-          user_id: string;
-          topic: string;
-          subtopic: string;
-          point_text: string;
-          point_key: string;
-          rag?: string;
-          notes?: string;
-          updated_at?: string;
-        };
+          id: string
+          email: string
+          full_name?: string | null
+          avatar_url?: string | null
+          created_at?: string
+        }
         Update: {
-          id?: string;
-          user_id?: string;
-          topic?: string;
-          subtopic?: string;
-          point_text?: string;
-          point_key?: string;
-          rag?: string;
-          notes?: string;
-          updated_at?: string;
-        };
-      };
-    };
-  };
-};
+          id?: string
+          email?: string
+          full_name?: string | null
+          avatar_url?: string | null
+          created_at?: string
+        }
+        Relationships: []
+      }
+    }
+    Views: {
+      [_ in never]: never
+    }
+    Functions: {
+      [_ in never]: never
+    }
+    Enums: {
+      [_ in never]: never
+    }
+  }
+}
