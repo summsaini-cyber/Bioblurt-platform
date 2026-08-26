@@ -100,7 +100,7 @@ RAG rules:
         model: "gpt-5.6-luna",
         messages: [{ role: "user", content: prompt }],
         temperature: 0.2,
-        max_tokens: 1000,
+        max_completion_tokens: 1000,
       }),
     });
 
