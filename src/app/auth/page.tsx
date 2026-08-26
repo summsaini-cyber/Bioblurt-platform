@@ -1,11 +1,11 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense } from "react";
 import { createClient } from "@/lib/supabase";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Dna, Mail, Lock, Loader2 } from "lucide-react";
 
-export default function AuthPage() {
+function AuthForm() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isSignUp, setIsSignUp] = useState(false);
@@ -113,7 +113,7 @@ export default function AuthPage() {
             </div>
 
             {error && (
-              <div className={`text-sm ${error.includes("Check") || error.includes("Verification failed") ? "text-red" : "text-red"}`}>
+              <div className={`text-sm ${error.includes("Check") ? "text-green" : "text-red"}`}>
                 {error}
               </div>
             )}
@@ -139,5 +139,22 @@ export default function AuthPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function AuthPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen flex items-center justify-center p-4">
+        <div className="text-center space-y-4">
+          <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-primary/10">
+            <Dna className="w-8 h-8 text-primary animate-pulse" />
+          </div>
+          <h1 className="text-2xl font-bold">Loading...</h1>
+        </div>
+      </div>
+    }>
+      <AuthForm />
+    </Suspense>
   );
 }
