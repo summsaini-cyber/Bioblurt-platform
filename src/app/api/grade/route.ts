@@ -6,10 +6,8 @@ function normalizeMatchedPoints(aiMatched: string[], specPoints: string[]): stri
   for (const aiPoint of aiMatched) {
     const aiLower = aiPoint.toLowerCase().trim();
 
-    // 1. Exact match
     let match = specPoints.find((sp) => sp.toLowerCase().trim() === aiLower);
 
-    // 2. One contains the other
     if (!match) {
       match = specPoints.find(
         (sp) =>
@@ -18,7 +16,6 @@ function normalizeMatchedPoints(aiMatched: string[], specPoints: string[]): stri
       );
     }
 
-    // 3. Word overlap (>60% of words in common)
     if (!match) {
       const aiWords = new Set(aiLower.split(/\s+/).filter((w) => w.length > 3));
       let bestOverlap = 0;
@@ -99,7 +96,6 @@ RAG rules:
       body: JSON.stringify({
         model: "gpt-5.6-luna",
         messages: [{ role: "user", content: prompt }],
-        temperature: 0.2,
         max_completion_tokens: 1000,
       }),
     });
@@ -115,11 +111,9 @@ RAG rules:
     const data = await response.json();
     const content = data.choices[0].message.content;
 
-    // Strip any markdown code blocks just in case
     const cleanJson = content.replace(/```json\n?|\n?```/g, "").trim();
     const parsed = JSON.parse(cleanJson);
 
-    // Normalize AI's matched points back to exact spec point strings
     parsed.matchedPoints = normalizeMatchedPoints(
       parsed.matchedPoints || [],
       specPoints
