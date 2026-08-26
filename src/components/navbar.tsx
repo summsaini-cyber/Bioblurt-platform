@@ -4,7 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { createClient } from "@/lib/supabase";
 import { useRouter } from "next/navigation";
-import { Dna, LayoutDashboard, BookOpen, ClipboardList, LogOut } from "lucide-react";
+import { Dna, LayoutDashboard, BookOpen, ClipboardList, LogOut, Coffee } from "lucide-react";
 
 export default function Navbar() {
   const pathname = usePathname();
@@ -51,13 +51,26 @@ export default function Navbar() {
           })}
         </div>
 
-        <button
-          onClick={signOut}
-          className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm text-muted hover:text-red hover:bg-red/10 transition-colors"
-        >
-          <LogOut className="w-4 h-4" />
-          <span className="hidden sm:inline">Sign out</span>
-        </button>
+        {/* RIGHT SIDE GROUP */}
+        <div className="flex items-center gap-1">
+          <a
+            href="https://buymeacoffee.com/bioblurt"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium bg-[#FFDD00]/10 text-[#FFDD00] hover:bg-[#FFDD00]/20 transition-colors"
+          >
+            <Coffee className="w-4 h-4" />
+            <span className="hidden sm:inline">Coffee</span>
+          </a>
+
+          <button
+            onClick={signOut}
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm text-muted hover:text-red hover:bg-red/10 transition-colors"
+          >
+            <LogOut className="w-4 h-4" />
+            <span className="hidden sm:inline">Sign out</span>
+          </button>
+        </div>
       </div>
     </nav>
   );

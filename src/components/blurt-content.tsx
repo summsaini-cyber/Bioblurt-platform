@@ -5,16 +5,17 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase";
 import { AQA_TOPICS } from "@/lib/spec-data";
-import { calculateScore, getRagStatus, getEffectiveRank } from "@/lib/scoring-engine";
+import { getRagStatus, getEffectiveRank } from "@/lib/scoring-engine";
 import { ArrowLeft, Home, CheckCircle, XCircle, ChevronDown } from "lucide-react";
 
 export default function BlurtContent({ userId, topic, subtopic }: { userId: string; topic: string; subtopic: string }) {
   const [text, setText] = useState("");
-  const [result, setResult] = useState<{ score: number; matched: string[] } | null>(null);
+  const [result, setResult] = useState<{ score: number; matched: string[]; feedback?: string } | null>(null);
   const [history, setHistory] = useState<{ score: number; manual_rag: string | null; created_at: string }[]>([]);
   const [manualRag, setManualRag] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
   const [showDetails, setShowDetails] = useState(false);
+  const [gradeError, setGradeError] = useState("");
   const router = useRouter();
   const supabase = createClient();
 
@@ -39,22 +40,45 @@ export default function BlurtContent({ userId, topic, subtopic }: { userId: stri
 
   async function handleSubmit() {
     if (!text.trim()) return;
-    const res = calculateScore(text, specPoints);
-    setResult(res);
     setSaving(true);
+    setGradeError("");
 
-    await supabase.from("blurts").insert({
-      user_id: userId,
-      topic,
-      subtopic,
-      score: res.score,
-      blurt_text: text,
-      matched_points: res.matched,
-      manual_rag: manualRag,
-    } as any);
+    try {
+      const res = await fetch("/api/grade", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ userText: text, specPoints, topic, subtopic }),
+      });
 
-    setSaving(false);
-    setHistory((prev) => [{ score: res.score, manual_rag: manualRag, created_at: new Date().toISOString() }, ...prev]);
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Grading failed");
+
+      setResult({
+        score: data.score,
+        matched: data.matchedPoints || [],
+        feedback: data.feedback,
+      });
+
+      await supabase.from("blurts").insert({
+        user_id: userId,
+        topic,
+        subtopic,
+        score: data.score,
+        blurt_text: text,
+        matched_points: data.matchedPoints || [],
+        manual_rag: manualRag,
+        feedback: data.feedback,
+      } as any);
+
+      setHistory((prev) => [
+        { score: data.score, manual_rag: manualRag, created_at: new Date().toISOString() },
+        ...prev,
+      ]);
+    } catch (err: any) {
+      setGradeError(err.message);
+    } finally {
+      setSaving(false);
+    }
   }
 
   async function setRag(rag: string) {
@@ -125,8 +149,13 @@ export default function BlurtContent({ userId, topic, subtopic }: { userId: stri
           disabled={saving || !text.trim()}
           className="btn-primary w-full disabled:opacity-50"
         >
-          {saving ? "Saving..." : "Submit Blurt"}
+          {saving ? "Grading with AI..." : "Submit Blurt"}
         </button>
+        {gradeError && (
+          <div className="text-sm text-red bg-red/10 rounded-xl px-4 py-3">
+            {gradeError}
+          </div>
+        )}
       </div>
 
       {/* Results */}
@@ -159,6 +188,14 @@ export default function BlurtContent({ userId, topic, subtopic }: { userId: stri
               </div>
             </div>
           </div>
+
+          {/* AI Feedback */}
+          {result?.feedback && (
+            <div className="dashboard-card border-primary/20">
+              <div className="text-sm font-semibold text-primary mb-2">AI Feedback</div>
+              <p className="text-sm text-text-secondary leading-relaxed">{result.feedback}</p>
+            </div>
+          )}
 
           {/* Correct / Incorrect Summary */}
           <div className="grid grid-cols-2 gap-4">

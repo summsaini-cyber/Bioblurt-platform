@@ -1,8 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { createClient } from "@/lib/supabase";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { Dna, Mail, Lock, Loader2 } from "lucide-react";
 
 export default function AuthPage() {
@@ -11,8 +11,26 @@ export default function AuthPage() {
   const [isSignUp, setIsSignUp] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [verifying, setVerifying] = useState(false);
   const router = useRouter();
+  const searchParams = useSearchParams();
   const supabase = createClient();
+
+  // Handle email confirmation callback
+  useEffect(() => {
+    const code = searchParams.get("code");
+    if (code) {
+      setVerifying(true);
+      supabase.auth.exchangeCodeForSession(code).then(({ error }) => {
+        if (error) {
+          setError("Verification failed: " + error.message);
+          setVerifying(false);
+        } else {
+          router.push("/");
+        }
+      });
+    }
+  }, [searchParams, supabase, router]);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -30,6 +48,20 @@ export default function AuthPage() {
     }
 
     setLoading(false);
+  }
+
+  if (verifying) {
+    return (
+      <div className="min-h-screen flex items-center justify-center p-4">
+        <div className="text-center space-y-4">
+          <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-primary/10">
+            <Dna className="w-8 h-8 text-primary animate-pulse" />
+          </div>
+          <h1 className="text-2xl font-bold">Verifying your email...</h1>
+          <p className="text-muted">Just a moment while we log you in.</p>
+        </div>
+      </div>
+    );
   }
 
   return (
@@ -81,7 +113,7 @@ export default function AuthPage() {
             </div>
 
             {error && (
-              <div className={`text-sm ${error.includes("Check") ? "text-green" : "text-red"}`}>
+              <div className={`text-sm ${error.includes("Check") || error.includes("Verification failed") ? "text-red" : "text-red"}`}>
                 {error}
               </div>
             )}
