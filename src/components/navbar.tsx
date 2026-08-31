@@ -4,7 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { createClient } from "@/lib/supabase";
 import { useRouter } from "next/navigation";
-import { Dna, LayoutDashboard, BookOpen, ClipboardList, LogOut, Coffee, TrendingUp } from "lucide-react";
+import { Dna, LayoutDashboard, BookOpen, ClipboardList, LogOut, Coffee, TrendingUp, FileText } from "lucide-react";
 
 export default function Navbar() {
   const pathname = usePathname();
@@ -21,6 +21,7 @@ export default function Navbar() {
     { href: "/topics", label: "Topics", icon: BookOpen },
     { href: "/tracker", label: "Tracker", icon: ClipboardList },
     { href: "/progress", label: "Progress", icon: TrendingUp },
+    { href: "/exam-practice", label: "Exam", icon: FileText },
   ];
 
   return (
@@ -52,7 +53,6 @@ export default function Navbar() {
           })}
         </div>
 
-        {/* RIGHT SIDE GROUP */}
         <div className="flex items-center gap-1">
           <a
             href="https://buymeacoffee.com/bioblurt"
