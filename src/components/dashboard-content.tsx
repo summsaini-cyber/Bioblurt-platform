@@ -5,7 +5,7 @@ import Link from "next/link";
 import { createClient } from "@/lib/supabase";
 import { AQA_TOPICS, getAllSpecPoints } from "@/lib/spec-data";
 import { getRagStatus, getEffectiveRank } from "@/lib/scoring-engine";
-import { TrendingUp, Clock, Target, BookOpen, ArrowRight, AlertTriangle, Zap } from "lucide-react";
+import { BookOpen, ArrowRight, Zap, Trophy } from "lucide-react";
 
 interface BlurtRow {
   topic: string;
@@ -72,16 +72,14 @@ export default function DashboardContent({ userId }: { userId: string }) {
     }
   }
 
-  // Weak topics
+  // Weak topics — ONLY attempted subtopics that are Red or < 50%
   const weak: { topic: string; subtopic: string; score: number; rag: string; reason: string }[] = [];
   for (const [topic, subs] of Object.entries(AQA_TOPICS)) {
     for (const sub of Object.keys(subs)) {
       const best = blurts
         .filter((b) => b.topic === topic && b.subtopic === sub)
         .sort((a, b) => b.score - a.score)[0];
-      if (!best) {
-        weak.push({ topic, subtopic: sub, score: 0, rag: "New", reason: "Not attempted" });
-      } else {
+      if (best) {
         const manual = best.manual_rag;
         const rag = manual || getRagStatus(best.score, null).status;
         if (rag === "Red" || best.score < 50) {
@@ -90,7 +88,7 @@ export default function DashboardContent({ userId }: { userId: string }) {
       }
     }
   }
-  weak.sort((a, b) => (a.rag === "Red" ? -1 : 1) - (b.rag === "Red" ? -1 : 1) || a.score - b.score);
+  weak.sort((a, b) => a.score - b.score); // weakest first
   const topWeak = weak.slice(0, 5);
 
   // RAG counts
@@ -178,19 +176,29 @@ export default function DashboardContent({ userId }: { userId: string }) {
           <h3 className="font-semibold text-lg">Weak Topics</h3>
         </div>
 
-        {topWeak.length === 0 ? (
+        {blurts.length === 0 ? (
           <div className="text-center py-8 space-y-3">
             <p className="text-muted">Do a blurt to get started!</p>
             <Link href="/topics" className="btn-primary inline-flex items-center gap-2">
               Start Blurting <ArrowRight className="w-4 h-4" />
             </Link>
           </div>
+        ) : weak.length === 0 ? (
+          <div className="text-center py-8 space-y-3">
+            <Trophy className="w-8 h-8 text-green mx-auto" />
+            <p className="text-muted">No weak topics right now — you're doing great!</p>
+          </div>
         ) : (
           <div className="space-y-3">
             {topWeak.map((w) => (
               <div key={`${w.topic}|${w.subtopic}`} className="flex items-center gap-4">
                 <div className="flex-1 p-3 rounded-xl bg-surface border border-border">
-                  <div className="font-medium text-sm">{w.subtopic}</div>
+                  <div className="flex items-center justify-between">
+                    <div className="font-medium text-sm">{w.subtopic}</div>
+                    <span className={`text-sm font-bold ${w.score >= 40 ? "text-amber" : "text-red"}`}>
+                      {w.score}%
+                    </span>
+                  </div>
                   <div className="text-xs text-muted">{w.topic} • {w.reason}</div>
                 </div>
                 <Link
@@ -201,6 +209,9 @@ export default function DashboardContent({ userId }: { userId: string }) {
                 </Link>
               </div>
             ))}
+            <div className="text-center pt-2">
+              <p className="text-xs text-muted">This is all! Do some more blurts for weak topic reviews.</p>
+            </div>
           </div>
         )}
       </div>
