@@ -5,7 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase";
 import { ExamQuestion } from "@/lib/exam-questions";
-import { ChevronLeft, Clock, Lightbulb, Send, RotateCcw, CheckCircle, XCircle, AlertTriangle } from "lucide-react";
+import { ChevronLeft, Clock, Lightbulb, Send, RotateCcw, CheckCircle, XCircle, AlertTriangle, GripVertical } from "lucide-react";
 
 export default function ExamQuestionContent({ question, userId }: { question: ExamQuestion; userId: string }) {
   const [plan, setPlan] = useState("");
@@ -83,7 +83,6 @@ export default function ExamQuestionContent({ question, userId }: { question: Ex
       setResult(data);
       setSubmitted(true);
 
-      // Save to Supabase
       await supabase.from("exam_attempts").insert({
         user_id: userId,
         question_id: question.id,
@@ -113,7 +112,33 @@ export default function ExamQuestionContent({ question, userId }: { question: Ex
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 relative">
+      {/* Floating Timer */}
+      {!submitted && (
+        <div className="hidden lg:block fixed right-6 top-28 w-52 z-40">
+          <div className="dashboard-card p-4 space-y-3">
+            <div className="flex items-center gap-2 text-sm font-semibold text-primary">
+              <GripVertical className="w-4 h-4 text-muted" />
+              <Clock className="w-4 h-4" /> Timer
+            </div>
+            {!timerOn && timeLeft === 0 ? (
+              <button onClick={startTimer} className="btn-secondary w-full text-xs flex items-center justify-center gap-2">
+                <Clock className="w-3 h-3" /> Start ({formatTime(recommendedTime)})
+              </button>
+            ) : (
+              <div className="text-center space-y-2">
+                <div className={`text-3xl font-mono font-bold ${timeLeft < 30 ? "text-red" : "text-primary"}`}>
+                  {formatTime(timeLeft)}
+                </div>
+                <button onClick={stopTimer} className="text-xs text-muted hover:text-text-secondary">
+                  Stop
+                </button>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
       {/* Header */}
       <div className="flex items-center gap-3">
         <button
@@ -123,37 +148,33 @@ export default function ExamQuestionContent({ question, userId }: { question: Ex
           <ChevronLeft className="w-5 h-5" />
         </button>
         <div>
-          <div className="flex items-center gap-2">
-            <h1 className="text-xl font-bold">{question.topic}</h1>
-            <span className="text-xs font-semibold bg-primary/10 text-primary px-2 py-1 rounded-lg">
-              {question.marks} marks
-            </span>
-          </div>
+          <h1 className="text-xl font-bold">{question.topic}</h1>
           <p className="text-muted text-xs">{question.paper === "paper1" ? "Paper 1" : "Paper 2"}</p>
         </div>
       </div>
 
-      {/* Question Box */}
+      {/* Question Box — marks now inside the question */}
       <div className="dashboard-card border-l-4 border-l-primary">
-        <p className="text-text-primary font-medium leading-relaxed">{question.question}</p>
+        <p className="text-text-primary font-medium leading-relaxed">
+          {question.question}{" "}
+          <span className="text-amber font-semibold">[{question.marks} marks]</span>
+        </p>
       </div>
 
-      {/* Timer */}
+      {/* Mobile Timer (bottom bar) */}
       {!submitted && (
-        <div className="flex items-center gap-3">
+        <div className="lg:hidden fixed bottom-0 left-0 right-0 z-40 bg-surface border-t border-border p-3 flex items-center justify-between">
           {!timerOn && timeLeft === 0 ? (
-            <button onClick={startTimer} className="btn-secondary text-sm flex items-center gap-2">
-              <Clock className="w-4 h-4" /> Start Timer ({formatTime(recommendedTime)})
+            <button onClick={startTimer} className="btn-secondary text-sm flex items-center gap-2 w-full justify-center">
+              <Clock className="w-4 h-4" /> Start Timer
             </button>
           ) : (
-            <div className="flex items-center gap-3">
-              <div className={`text-lg font-mono font-bold ${timeLeft < 30 ? "text-red" : "text-primary"}`}>
+            <>
+              <div className={`text-xl font-mono font-bold ${timeLeft < 30 ? "text-red" : "text-primary"}`}>
                 {formatTime(timeLeft)}
               </div>
-              <button onClick={stopTimer} className="text-xs text-muted hover:text-text-secondary">
-                Stop
-              </button>
-            </div>
+              <button onClick={stopTimer} className="text-sm text-muted">Stop</button>
+            </>
           )}
         </div>
       )}
@@ -180,22 +201,23 @@ export default function ExamQuestionContent({ question, userId }: { question: Ex
         </div>
       )}
 
-      {/* Answer Area */}
+      {/* Answer Area — fixed lined paper alignment */}
       {!submitted ? (
         <div className="space-y-3">
           <label className="block font-medium text-sm">Your Answer</label>
-          <div className="relative">
-            <textarea
-              value={answer}
-              onChange={(e) => setAnswer(e.target.value)}
-              className="w-full h-96 bg-surface border border-border rounded-xl p-5 text-text-primary placeholder:text-muted focus:border-primary focus:outline-none resize-none leading-[2.2] text-[15px]"
-              placeholder="Write your answer here..."
-              style={{
-                backgroundImage: "linear-gradient(transparent 95%, rgba(255,255,255,0.05) 95%)",
-                backgroundSize: "100% 2.2em",
-              }}
-            />
-          </div>
+          <textarea
+            value={answer}
+            onChange={(e) => setAnswer(e.target.value)}
+            className="w-full h-96 bg-surface border border-border rounded-xl p-5 text-text-primary placeholder:text-muted focus:border-primary focus:outline-none resize-none text-[15px]"
+            placeholder="Write your answer here..."
+            style={{
+              lineHeight: "2.2em",
+              backgroundImage: "linear-gradient(transparent calc(2.2em - 1px), rgba(255,255,255,0.08) calc(2.2em - 1px))",
+              backgroundSize: "100% 2.2em",
+              backgroundPosition: "0 1.25rem",
+              backgroundAttachment: "local",
+            }}
+          />
           <button
             onClick={handleSubmit}
             disabled={saving || !answer.trim()}
