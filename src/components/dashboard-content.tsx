@@ -5,7 +5,7 @@ import Link from "next/link";
 import { createClient } from "@/lib/supabase";
 import { AQA_TOPICS, getAllSpecPoints } from "@/lib/spec-data";
 import { getRagStatus, getEffectiveRank } from "@/lib/scoring-engine";
-import { TrendingUp, Clock, Target, BookOpen, ArrowRight, AlertTriangle } from "lucide-react";
+import { TrendingUp, Clock, Target, BookOpen, ArrowRight, AlertTriangle, Zap } from "lucide-react";
 
 interface BlurtRow {
   topic: string;
@@ -76,7 +76,6 @@ export default function DashboardContent({ userId }: { userId: string }) {
   const weak: { topic: string; subtopic: string; score: number; rag: string; reason: string }[] = [];
   for (const [topic, subs] of Object.entries(AQA_TOPICS)) {
     for (const sub of Object.keys(subs)) {
-      const key = `${topic}|${sub}`;
       const best = blurts
         .filter((b) => b.topic === topic && b.subtopic === sub)
         .sort((a, b) => b.score - a.score)[0];
@@ -172,6 +171,40 @@ export default function DashboardContent({ userId }: { userId: string }) {
         </div>
       )}
 
+      {/* Weak Topics */}
+      <div className="dashboard-card">
+        <div className="flex items-center gap-2 mb-4">
+          <Zap className="w-5 h-5 text-red" />
+          <h3 className="font-semibold text-lg">Weak Topics</h3>
+        </div>
+
+        {topWeak.length === 0 ? (
+          <div className="text-center py-8 space-y-3">
+            <p className="text-muted">Do a blurt to get started!</p>
+            <Link href="/topics" className="btn-primary inline-flex items-center gap-2">
+              Start Blurting <ArrowRight className="w-4 h-4" />
+            </Link>
+          </div>
+        ) : (
+          <div className="space-y-3">
+            {topWeak.map((w) => (
+              <div key={`${w.topic}|${w.subtopic}`} className="flex items-center gap-4">
+                <div className="flex-1 p-3 rounded-xl bg-surface border border-border">
+                  <div className="font-medium text-sm">{w.subtopic}</div>
+                  <div className="text-xs text-muted">{w.topic} • {w.reason}</div>
+                </div>
+                <Link
+                  href={`/blurt/${encodeURIComponent(w.topic)}/${encodeURIComponent(w.subtopic)}`}
+                  className="btn-secondary whitespace-nowrap text-sm"
+                >
+                  Review →
+                </Link>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+
       {/* Topic Progress */}
       {Object.keys(topicStats).length > 0 && (
         <div>
@@ -200,29 +233,6 @@ export default function DashboardContent({ userId }: { userId: string }) {
                   </div>
                 );
               })}
-          </div>
-        </div>
-      )}
-
-      {/* Recommended Review */}
-      {topWeak.length > 0 && (
-        <div>
-          <h3 className="font-semibold text-lg mb-4">Recommended Review</h3>
-          <div className="space-y-3">
-            {topWeak.map((w) => (
-              <div key={w.key} className="flex items-center gap-4">
-                <div className="weak-topic-card flex-1">
-                  <div className="font-medium text-sm">{w.subtopic}</div>
-                  <div className="text-xs text-muted">{w.topic} • {w.reason}</div>
-                </div>
-                <Link
-                  href={`/blurt/${encodeURIComponent(w.topic)}/${encodeURIComponent(w.subtopic)}`}
-                  className="btn-secondary whitespace-nowrap text-sm"
-                >
-                  Review →
-                </Link>
-              </div>
-            ))}
           </div>
         </div>
       )}
