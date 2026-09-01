@@ -107,37 +107,29 @@ export default function ExamQuestionContent({
     setElapsedTime(0);
   }
 
-  // ── Draggable timer popup ──
-  const [position, setPosition] = useState({ x: 0, y: 0 });
+  // ── Draggable timer popup (delta-based, not absolute) ──
+  const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 });
   const [isDragging, setIsDragging] = useState(false);
-  const dragOffset = useRef({ x: 0, y: 0 });
-  const timerRef = useRef<HTMLDivElement>(null);
+  const dragStart = useRef({ x: 0, y: 0 });
+  const timerBoxRef = useRef<HTMLDivElement>(null);
 
   const handleMouseDown = useCallback((e: React.MouseEvent) => {
-    // Only drag from the header/grip area
     const target = e.target as HTMLElement;
     if (!target.closest("[data-drag-handle]")) return;
-
     setIsDragging(true);
-    const rect = timerRef.current?.getBoundingClientRect();
-    if (rect) {
-      dragOffset.current = {
-        x: e.clientX - rect.left,
-        y: e.clientY - rect.top,
-      };
-    }
-  }, []);
+    dragStart.current = {
+      x: e.clientX - dragOffset.x,
+      y: e.clientY - dragOffset.y,
+    };
+  }, [dragOffset]);
 
-  const handleMouseMove = useCallback(
-    (e: MouseEvent) => {
-      if (!isDragging) return;
-      setPosition({
-        x: e.clientX - dragOffset.current.x,
-        y: e.clientY - dragOffset.current.y,
-      });
-    },
-    [isDragging]
-  );
+  const handleMouseMove = useCallback((e: MouseEvent) => {
+    if (!isDragging) return;
+    setDragOffset({
+      x: e.clientX - dragStart.current.x,
+      y: e.clientY - dragStart.current.y,
+    });
+  }, [isDragging]);
 
   const handleMouseUp = useCallback(() => {
     setIsDragging(false);
@@ -160,7 +152,6 @@ export default function ExamQuestionContent({
     setSaving(true);
     setError("");
 
-    // Stop the stopwatch and capture final time
     const finalTime = elapsedTime;
     setIsRunning(false);
 
@@ -213,7 +204,7 @@ export default function ExamQuestionContent({
     setResult(null);
     setError("");
     resetStopwatch();
-    setPosition({ x: 0, y: 0 });
+    setDragOffset({ x: 0, y: 0 });
   }
 
   const timerActive = elapsedTime > 0 || isRunning || isPaused;
@@ -223,10 +214,10 @@ export default function ExamQuestionContent({
       {/* ── Floating Draggable Timer (Desktop) ── */}
       {!submitted && (
         <div
-          ref={timerRef}
+          ref={timerBoxRef}
           className="hidden lg:block fixed right-6 top-28 w-56 z-40 select-none"
           style={{
-            transform: `translate(${position.x}px, ${position.y}px)`,
+            transform: `translate(${dragOffset.x}px, ${dragOffset.y}px)`,
             cursor: isDragging ? "grabbing" : "default",
           }}
           onMouseDown={handleMouseDown}
