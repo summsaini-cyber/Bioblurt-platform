@@ -2,11 +2,30 @@ import { NextRequest, NextResponse } from "next/server";
 
 export async function POST(req: NextRequest) {
   try {
-    const { answer, question, marks, markScheme, topic } = await req.json();
+    const {
+      answer,
+      question,
+      marks,
+      markScheme,
+      topic,
+      timeSpent,
+      recommendedMin,
+      recommendedMax,
+      recommendedLabel,
+    } = await req.json();
 
     if (!answer || !question || !markScheme?.length) {
-      return NextResponse.json({ error: "Missing answer or question data" }, { status: 400 });
+      return NextResponse.json(
+        { error: "Missing answer or question data" },
+        { status: 400 }
+      );
     }
+
+    // Build time analysis context for the AI
+    const timeSpentMins = Math.round((timeSpent || 0) / 60 * 10) / 10;
+    const timeContext = timeSpent
+      ? `The student spent ${timeSpentMins} minutes on this ${marks}-mark question. The recommended time for a ${marks}-mark question is ${recommendedLabel} (${Math.round((recommendedMin || 0) / 60)}–${Math.round((recommendedMax || 0) / 60)} minutes).`
+      : "";
 
     const prompt = `You are an AQA A-Level Biology examiner marking a student's exam answer.
 
@@ -20,6 +39,8 @@ ${markScheme.map((m: string, i: number) => `${i + 1}. ${m}`).join("\n")}
 Student's Answer:
 """${answer}"""
 
+${timeContext}
+
 Mark this answer strictly out of ${marks} using the official mark scheme above, but be fair with benefit-of-doubt where the student's wording is close but not exact.
 
 For each mark in the scheme, decide:
@@ -31,6 +52,7 @@ Respond ONLY in this exact JSON format (no markdown, no extra text):
 {
   "score": number,
   "feedback": "2-3 sentences of constructive examiner feedback. Be specific about what was good and what to improve.",
+  "timeFeedback": "1 sentence comparing the time they spent to the recommended time. Be encouraging but honest. If they were way over, suggest they practice pacing. If they were under, note that they may have rushed. If they were within range, praise their timing.",
   "marksAwarded": ["description of each mark awarded and why"],
   "marksMissed": ["description of each mark missed and what the mark scheme wanted"],
   "tentativeMarks": ["description of any benefit-of-doubt marks given and why they were tentative"]
@@ -40,7 +62,8 @@ Rules:
 - Score must be an integer between 0 and ${marks}
 - If the student writes complete nonsense or leaves it blank, score 0
 - If the student exceeds the mark cap, still only award up to ${marks}
-- Be encouraging but honest — AQA examiners are strict but fair`;
+- Be encouraging but honest — AQA examiners are strict but fair
+- The timeFeedback field MUST be included even if no time data was provided (just say "Time data not available for this attempt.")`;
 
     const response = await fetch("https://api.openai.com/v1/chat/completions", {
       method: "POST",
@@ -57,13 +80,16 @@ Rules:
 
     if (!response.ok) {
       const err = await response.text();
-      return NextResponse.json({ error: "AI service error: " + err }, { status: 502 });
+      return NextResponse.json(
+        { error: "AI service error: " + err },
+        { status: 502 }
+      );
     }
 
     const data = await response.json();
     const content = data.choices[0].message.content;
 
-    const cleanJson = content.replace(/```json\n?|\n?```/g, "").trim();
+    const cleanJson = content.replace(/\`\`\`json\n?|\n?\`\`\`/g, "").trim();
     const result = JSON.parse(cleanJson);
 
     // Ensure score is within bounds
@@ -71,6 +97,9 @@ Rules:
 
     return NextResponse.json(result);
   } catch (err: any) {
-    return NextResponse.json({ error: err.message || "Grading failed" }, { status: 500 });
+    return NextResponse.json(
+      { error: err.message || "Grading failed" },
+      { status: 500 }
+    );
   }
 }
