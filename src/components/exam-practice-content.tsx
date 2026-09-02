@@ -61,8 +61,8 @@ export default function ExamPracticeContent({ paper, topic }: { paper?: string; 
   }
 
   // STEP 2: Paper selected, no topic — show topics
-  const validPaper = paper as "paper1" | "paper2";
-  const topics = EXAM_TOPICS[validPaper] || [];
+const validPaper = paper as "paper1" | "paper2";
+const topics = EXAM_TOPICS.aqa?.[validPaper] || [];
 
   if (!topic) {
     return (
