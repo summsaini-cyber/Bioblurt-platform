@@ -8,6 +8,7 @@ import { EssayQuestion } from "@/lib/essay-data";
 import {
   ChevronLeft,
   Clock,
+  Lightbulb,
   Send,
   RotateCcw,
   PenTool,
@@ -20,29 +21,44 @@ import {
   Timer,
 } from "lucide-react";
 
-export default function EssayWriteContent({ essay, userId }: { essay: EssayQuestion; userId: string }) {
+export default function EssayWriteContent({
+  essay,
+  userId,
+}: {
+  essay: EssayQuestion;
+  userId: string;
+}) {
+  const [plan, setPlan] = useState("");
   const [text, setText] = useState("");
-  const [timerOn, setTimerOn] = useState(false);
+  const [showPlan, setShowPlan] = useState(true);
+
   const [timeLeft, setTimeLeft] = useState(45 * 60);
+  const [isRunning, setIsRunning] = useState(false);
+  const [isPaused, setIsPaused] = useState(false);
+
   const [submitted, setSubmitted] = useState(false);
   const [result, setResult] = useState<any>(null);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
 
-  const [timerPosition, setTimerPosition] = useState({ x: 0, y: 0 });
-  const [dragging, setDragging] = useState(false);
+  const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 });
+  const [isDragging, setIsDragging] = useState(false);
 
   const router = useRouter();
   const supabase = createClient();
+
   const timerRef = useRef<NodeJS.Timeout | null>(null);
   const dragStart = useRef({ x: 0, y: 0 });
+  const timerBoxRef = useRef<HTMLDivElement>(null);
 
+  // ── Countdown timer ──
   useEffect(() => {
-    if (timerOn && timeLeft > 0) {
+    if (isRunning && timeLeft > 0) {
       timerRef.current = setInterval(() => {
         setTimeLeft((prev) => {
           if (prev <= 1) {
-            setTimerOn(false);
+            setIsRunning(false);
+            setIsPaused(false);
             return 0;
           }
           return prev - 1;
@@ -55,48 +71,68 @@ export default function EssayWriteContent({ essay, userId }: { essay: EssayQuest
     return () => {
       if (timerRef.current) clearInterval(timerRef.current);
     };
-  }, [timerOn, timeLeft]);
+  }, [isRunning, timeLeft]);
 
-  const handleTimerMouseDown = useCallback(
-    (e: React.MouseEvent) => {
-      e.preventDefault();
-      setDragging(true);
+  function startTimer() {
+    setIsRunning(true);
+    setIsPaused(false);
+  }
 
-      dragStart.current = {
-        x: e.clientX - timerPosition.x,
-        y: e.clientY - timerPosition.y,
-      };
-    },
-    [timerPosition]
-  );
+  function pauseTimer() {
+    setIsRunning(false);
+    setIsPaused(true);
+  }
 
-  const handleTimerMouseMove = useCallback(
+  function resumeTimer() {
+    setIsRunning(true);
+    setIsPaused(false);
+  }
+
+  function resetTimer() {
+    setIsRunning(false);
+    setIsPaused(false);
+    setTimeLeft(45 * 60);
+  }
+
+  // ── Draggable timer popup ──
+  const handleMouseDown = useCallback((e: React.MouseEvent) => {
+    const target = e.target as HTMLElement;
+    if (!target.closest("[data-drag-handle]")) return;
+
+    setIsDragging(true);
+    dragStart.current = {
+      x: e.clientX - dragOffset.x,
+      y: e.clientY - dragOffset.y,
+    };
+  }, [dragOffset]);
+
+  const handleMouseMove = useCallback(
     (e: MouseEvent) => {
-      if (!dragging) return;
+      if (!isDragging) return;
 
-      setTimerPosition({
+      setDragOffset({
         x: e.clientX - dragStart.current.x,
         y: e.clientY - dragStart.current.y,
       });
     },
-    [dragging]
+    [isDragging]
   );
 
-  const handleTimerMouseUp = useCallback(() => {
-    setDragging(false);
+  const handleMouseUp = useCallback(() => {
+    setIsDragging(false);
   }, []);
 
   useEffect(() => {
-    if (!dragging) return;
-
-    window.addEventListener("mousemove", handleTimerMouseMove);
-    window.addEventListener("mouseup", handleTimerMouseUp);
+    if (isDragging) {
+      window.addEventListener("mousemove", handleMouseMove);
+      window.addEventListener("mouseup", handleMouseUp);
+    }
 
     return () => {
-      window.removeEventListener("mousemove", handleTimerMouseMove);
-      window.removeEventListener("mouseup", handleTimerMouseUp);
+      window.removeEventListener("mousemove", handleMouseMove);
+      window.removeEventListener("mouseup", handleMouseUp);
     };
-  }, [dragging, handleTimerMouseMove, handleTimerMouseUp]);
+  }, [isDragging, handleMouseMove, handleMouseUp]);
 
   function formatTime(seconds: number) {
     const m = Math.floor(seconds / 60);
@@ -106,8 +142,12 @@ export default function EssayWriteContent({ essay, userId }: { essay: EssayQuest
 
   async function handleSubmit() {
     if (!text.trim()) return;
+
     setSaving(true);
     setError("");
+
+    const finalTime = 45 * 60 - timeLeft;
+    setIsRunning(false);
 
     try {
       const res = await fetch("/api/grade-essay", {
@@ -116,12 +156,15 @@ export default function EssayWriteContent({ essay, userId }: { essay: EssayQuest
         body: JSON.stringify({
           essay: essay.title,
           answer: text,
-          timeSpent: 45 * 60 - timeLeft,
+          timeSpent: finalTime,
         }),
       });
 
       const data = await res.json();
-      if (!res.ok) throw new Error(data.error || "Grading failed");
+
+      if (!res.ok) {
+        throw new Error(data.error || "Grading failed");
+      }
 
       setResult(data);
       setSubmitted(true);
@@ -136,7 +179,7 @@ export default function EssayWriteContent({ essay, userId }: { essay: EssayQuest
         feedback: data.feedback,
         strengths: data.strengths || [],
         improvements: data.improvements || [],
-        time_spent: 45 * 60 - timeLeft,
+        time_spent: finalTime,
       } as any);
     } catch (err: any) {
       setError(err.message);
@@ -146,14 +189,17 @@ export default function EssayWriteContent({ essay, userId }: { essay: EssayQuest
   }
 
   function reset() {
+    setPlan("");
     setText("");
+    setShowPlan(true);
     setSubmitted(false);
     setResult(null);
     setError("");
-    setTimerOn(false);
-    setTimeLeft(45 * 60);
-    setTimerPosition({ x: 0, y: 0 });
+    resetTimer();
+    setDragOffset({ x: 0, y: 0 });
   }
+
+  const timerActive = timeLeft < 45 * 60 || isRunning || isPaused;
 
   const bandColor =
     result?.band === "21-25 Extended Abstract"
@@ -167,12 +213,113 @@ export default function EssayWriteContent({ essay, userId }: { essay: EssayQuest
       : "text-red";
 
   return (
-    <div className="space-y-6">
-      {/* Header */}
+    <div className="space-y-6 relative">
+      {/* ── Floating Draggable Timer (Desktop) ── */}
+      {!submitted && (
+        <div
+          ref={timerBoxRef}
+          className="hidden lg:block fixed right-6 top-28 w-56 z-40 select-none"
+          style={{
+            transform: `translate(${dragOffset.x}px, ${dragOffset.y}px)`,
+            cursor: isDragging ? "grabbing" : "default",
+          }}
+          onMouseDown={handleMouseDown}
+        >
+          <div className="dashboard-card p-4 space-y-3 shadow-lg border border-border/50">
+            <div
+              data-drag-handle
+              className="flex items-center gap-2 text-sm font-semibold text-primary cursor-grab active:cursor-grabbing"
+            >
+              <GripVertical className="w-4 h-4 text-muted" />
+              <Timer className="w-4 h-4" /> Essay Timer
+            </div>
+
+            {!timerActive ? (
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  startTimer();
+                }}
+                className="btn-secondary w-full text-xs flex items-center justify-center gap-2"
+              >
+                <Play className="w-3 h-3" /> Start (45 minutes)
+              </button>
+            ) : (
+              <div className="text-center space-y-3">
+                <div
+                  className={`text-3xl font-mono font-bold ${
+                    timeLeft <= 0
+                      ? "text-red"
+                      : timeLeft <= 5 * 60
+                      ? "text-amber"
+                      : "text-green"
+                  }`}
+                >
+                  {formatTime(timeLeft)}
+                </div>
+
+                <div className="flex gap-2">
+                  {isRunning ? (
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        pauseTimer();
+                      }}
+                      className="btn-secondary flex-1 text-xs flex items-center justify-center gap-1"
+                    >
+                      <Pause className="w-3 h-3" /> Pause
+                    </button>
+                  ) : (
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        resumeTimer();
+                      }}
+                      disabled={timeLeft <= 0}
+                      className="btn-primary flex-1 text-xs flex items-center justify-center gap-1 disabled:opacity-50"
+                    >
+                      <Play className="w-3 h-3" /> Resume
+                    </button>
+                  )}
+
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      resetTimer();
+                    }}
+                    className="text-xs text-muted hover:text-text-secondary px-2"
+                    title="Reset"
+                  >
+                    <RotateCcw className="w-3 h-3" />
+                  </button>
+                </div>
+
+                {isPaused && (
+                  <div className="text-[10px] text-amber font-medium bg-amber/10 rounded-lg px-2 py-1">
+                    ⏸ Paused — typing disabled
+                  </div>
+                )}
+
+                {timeLeft <= 0 && (
+                  <div className="text-[10px] text-red font-medium bg-red/10 rounded-lg px-2 py-1">
+                    Time finished — typing disabled
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* ── Header ── */}
       <div className="flex items-center gap-3">
-        <button onClick={() => router.back()} className="text-muted hover:text-text-secondary">
+        <button
+          onClick={() => router.back()}
+          className="text-muted hover:text-text-secondary"
+        >
           <ChevronLeft className="w-5 h-5" />
         </button>
+
         <div>
           <div className="flex items-center gap-2">
             <h1 className="text-xl font-bold">Synoptic Essay</h1>
@@ -180,111 +327,75 @@ export default function EssayWriteContent({ essay, userId }: { essay: EssayQuest
               25 marks
             </span>
           </div>
+
           <p className="text-muted text-xs">
             {essay.year ? `AQA ${essay.year} Paper 3` : "AQA Specimen"}
           </p>
         </div>
       </div>
 
-      {/* Floating Timer */}
-      {!submitted && (
-        <div
-          className="fixed right-6 top-24 z-50 w-56"
-          style={{
-            transform: `translate(${timerPosition.x}px, ${timerPosition.y}px)`,
-          }}
-        >
-          <div className="dashboard-card shadow-xl border border-border">
-            <div
-              onMouseDown={handleTimerMouseDown}
-              className="flex items-center gap-2 mb-3 cursor-grab active:cursor-grabbing select-none"
-            >
-              <GripVertical className="w-4 h-4 text-muted" />
-              <Timer className="w-4 h-4 text-primary" />
-              <span className="text-sm font-semibold">Essay Timer</span>
-            </div>
-
-            {!timerOn ? (
-              <button
-                onClick={() => setTimerOn(true)}
-                disabled={timeLeft === 0}
-                className="btn-secondary w-full text-sm flex items-center justify-center gap-2 disabled:opacity-50"
-              >
-                <Play className="w-4 h-4" />
-                {timeLeft === 0 ? "Time Finished" : "Start 45-Min Timer"}
-              </button>
-            ) : (
-              <>
-                <div
-                  className={`text-3xl text-center font-mono font-bold mb-3 ${
-                    timeLeft < 300 ? "text-red" : "text-primary"
-                  }`}
-                >
-                  {formatTime(timeLeft)}
-                </div>
-
-                <button
-                  onClick={() => setTimerOn(false)}
-                  className="btn-secondary w-full text-sm flex items-center justify-center gap-2"
-                >
-                  <Pause className="w-4 h-4" />
-                  Pause
-                </button>
-              </>
-            )}
-
-            {!timerOn && timeLeft > 0 && (
-              <p className="text-[11px] text-muted text-center mt-2">
-                Start timer to begin writing
-              </p>
-            )}
-
-            {timerOn && (
-              <p className="text-[11px] text-muted text-center mt-2">
-                Pause = writing locked
-              </p>
-            )}
-
-            {timeLeft === 0 && (
-              <p className="text-[11px] text-red text-center mt-2 font-medium">
-                Time finished — writing locked
-              </p>
-            )}
-          </div>
-        </div>
-      )}
-
-      {/* Question */}
+      {/* ── Question Box ── */}
       <div className="dashboard-card border-l-4 border-l-primary">
         <p className="text-text-primary font-medium leading-relaxed text-lg">
           {essay.title}
         </p>
+
         <p className="text-xs text-muted mt-2">
-          Write an essay on the above title. You should use information from different parts of the A Level course and
-          show how the topics link together. [25 marks]
+          Write an essay on the above title. You should use information from
+          different parts of the A Level course and show how the topics link
+          together. [25 marks]
         </p>
       </div>
 
-      {/* Writing Area */}
+      {/* ── Planning Box ── */}
+      {!submitted && (
+        <div className="space-y-2">
+          <button
+            onClick={() => setShowPlan(!showPlan)}
+            className="flex items-center gap-2 text-sm font-medium text-primary hover:opacity-80 transition-opacity"
+          >
+            <Lightbulb className="w-4 h-4" />
+            {showPlan ? "Hide Planning Box" : "Show Planning Box"}
+          </button>
+
+          {showPlan && (
+            <textarea
+              value={plan}
+              onChange={(e) => setPlan(e.target.value)}
+              disabled={isPaused}
+              className="w-full h-32 bg-surface border border-border rounded-xl p-4 text-sm text-text-primary placeholder:text-muted focus:border-primary focus:outline-none resize-none disabled:opacity-50 disabled:cursor-not-allowed"
+              placeholder="Jot down your plan here before you answer..."
+            />
+          )}
+        </div>
+      )}
+
+      {/* ── Writing Area ── */}
       {!submitted ? (
         <div className="space-y-3">
-          <label className="block font-medium text-sm flex items-center gap-2">
-            <PenTool className="w-4 h-4" /> Your Essay
+          <label className="block font-medium text-sm">
+            Your Essay
+            {isPaused && (
+              <span className="ml-2 text-xs text-amber font-medium">
+                (Timer paused — resume to type)
+              </span>
+            )}
           </label>
 
           <textarea
             value={text}
             onChange={(e) => setText(e.target.value)}
-            disabled={!timerOn}
-            className="w-full h-[32rem] bg-surface border border-border rounded-xl p-5 text-text-primary placeholder:text-muted focus:border-primary focus:outline-none resize-none text-[15px] disabled:opacity-60 disabled:cursor-not-allowed"
+            disabled={!isRunning}
+            className="w-full h-[32rem] bg-surface border border-border rounded-xl p-5 text-text-primary placeholder:text-muted focus:border-primary focus:outline-none resize-none text-[15px] disabled:opacity-60 disabled:cursor-not-allowed transition-opacity"
             placeholder={
-              timerOn
+              isRunning
                 ? "Write your essay here. Aim for 3-4 sides in the exam (about 600-900 words)..."
                 : "Start the timer before writing..."
             }
             style={{
               lineHeight: "2.2em",
-              backgroundImage: "linear-gradient(transparent calc(2.2em - 1px), rgba(255,255,255,0.06) calc(2.2em - 1px))",
+              backgroundImage:
+                "linear-gradient(transparent calc(2.2em - 1px), rgba(255,255,255,0.06) calc(2.2em - 1px))",
               backgroundSize: "100% 2.2em",
               backgroundPosition: "0 1.25rem",
               backgroundAttachment: "local",
@@ -292,27 +403,47 @@ export default function EssayWriteContent({ essay, userId }: { essay: EssayQuest
           />
 
           <div className="flex items-center justify-between text-xs text-muted">
-            <span>{text.split(/\s+/).filter((w) => w.length > 0).length} words</span>
+            <span>
+              {text.split(/\s+/).filter((w) => w.length > 0).length} words
+            </span>
             <span>Target: 600–900 words</span>
           </div>
 
           <button
             onClick={handleSubmit}
-            disabled={saving || !text.trim()}
+            disabled={saving || !text.trim() || isPaused || !isRunning}
             className="btn-primary w-full flex items-center justify-center gap-2 disabled:opacity-50"
           >
-            {saving ? "Marking..." : <><Send className="w-4 h-4" /> Submit Essay</>}
+            {saving ? (
+              "Marking..."
+            ) : (
+              <>
+                <Send className="w-4 h-4" /> Submit Essay
+              </>
+            )}
           </button>
 
-          {error && <div className="text-sm text-red bg-red/10 rounded-xl px-4 py-3">{error}</div>}
+          {error && (
+            <div className="text-sm text-red bg-red/10 rounded-xl px-4 py-3">
+              {error}
+            </div>
+          )}
         </div>
       ) : (
-        /* Results */
+        /* ── Results ── */
         <div className="space-y-6">
           {/* Score */}
           <div className="dashboard-card text-center">
-            <div className={`text-6xl font-extrabold ${bandColor}`}>{result.score}/25</div>
-            <div className="mt-2 text-lg font-semibold">{result.band}</div>
+            <div
+              className={`text-6xl font-extrabold ${bandColor}`}
+            >
+              {result.score}/25
+            </div>
+
+            <div className="mt-2 text-lg font-semibold">
+              {result.band}
+            </div>
+
             <div className="mt-1 text-sm text-muted">
               {result.score >= 21
                 ? "Excellent — holistic understanding with strong synoptic links"
@@ -332,7 +463,10 @@ export default function EssayWriteContent({ essay, userId }: { essay: EssayQuest
               <div className="text-sm font-semibold text-primary mb-2 flex items-center gap-2">
                 <BookOpen className="w-4 h-4" /> Examiner Feedback
               </div>
-              <p className="text-sm text-text-secondary leading-relaxed">{result.feedback}</p>
+
+              <p className="text-sm text-text-secondary leading-relaxed">
+                {result.feedback}
+              </p>
             </div>
           )}
 
@@ -342,8 +476,12 @@ export default function EssayWriteContent({ essay, userId }: { essay: EssayQuest
               <div className="text-sm font-medium text-green flex items-center gap-2">
                 <CheckCircle className="w-4 h-4" /> Strengths
               </div>
+
               {result.strengths.map((s: string, i: number) => (
-                <div key={i} className="p-3 rounded-lg bg-green/5 border border-green/20 text-sm text-text-secondary">
+                <div
+                  key={i}
+                  className="p-3 rounded-lg bg-green/5 border border-green/20 text-sm text-text-secondary"
+                >
                   {s}
                 </div>
               ))}
@@ -356,8 +494,12 @@ export default function EssayWriteContent({ essay, userId }: { essay: EssayQuest
               <div className="text-sm font-medium text-amber flex items-center gap-2">
                 <AlertTriangle className="w-4 h-4" /> Areas to Improve
               </div>
+
               {result.improvements.map((s: string, i: number) => (
-                <div key={i} className="p-3 rounded-lg bg-amber/5 border border-amber/20 text-sm text-text-secondary">
+                <div
+                  key={i}
+                  className="p-3 rounded-lg bg-amber/5 border border-amber/20 text-sm text-text-secondary"
+                >
                   {s}
                 </div>
               ))}
@@ -366,10 +508,17 @@ export default function EssayWriteContent({ essay, userId }: { essay: EssayQuest
 
           {/* Actions */}
           <div className="flex gap-3">
-            <button onClick={reset} className="btn-secondary flex-1 flex items-center justify-center gap-2">
+            <button
+              onClick={reset}
+              className="btn-secondary flex-1 flex items-center justify-center gap-2"
+            >
               <RotateCcw className="w-4 h-4" /> Try Again
             </button>
-            <Link href="/essays" className="btn-primary flex-1 text-center">
+
+            <Link
+              href="/essays"
+              className="btn-primary flex-1 text-center"
+            >
               Back to Essays
             </Link>
           </div>

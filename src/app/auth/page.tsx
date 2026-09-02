@@ -302,7 +302,7 @@ function AuthForm() {
           </h1>
 
           <p className="text-muted mt-1">
-            Active Recall for AQA & Cambridge Biology
+            Active Recall for AQA
           </p>
         </div>
 
