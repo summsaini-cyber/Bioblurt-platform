@@ -4,7 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { createClient } from "@/lib/supabase";
 import { useRouter } from "next/navigation";
-import { Dna, LayoutDashboard, BookOpen, ClipboardList, LogOut, Coffee, TrendingUp, FileText } from "lucide-react";
+import { Dna, LayoutDashboard, BookOpen, ClipboardList, LogOut, Coffee, TrendingUp, FileText, PenTool } from "lucide-react";
 
 export default function Navbar() {
   const pathname = usePathname();
@@ -22,6 +22,7 @@ export default function Navbar() {
     { href: "/tracker", label: "Tracker", icon: ClipboardList },
     { href: "/progress", label: "Progress", icon: TrendingUp },
     { href: "/exam-practice", label: "Exam", icon: FileText },
+    { href: "/essays", label: "Essays", icon: PenTool },
   ];
 
   return (
