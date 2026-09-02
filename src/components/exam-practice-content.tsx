@@ -49,7 +49,9 @@ export default function ExamPracticeContent({ paper, topic }: { paper?: string; 
                 </div>
                 <p className="text-sm text-muted">Energy • Responses • Evolution • Gene Expression</p>
                 <p className="text-xs text-muted mt-1">
-                  {EXAM_QUESTIONS.filter((q) => q.paper === "paper2").length} questions available
+                  {EXAM_QUESTIONS.filter(
+                    (q) => q.board === "aqa" && q.paper === "paper2"
+                  ).length} questions available 
                 </p>
               </div>
               <ArrowRight className="w-5 h-5 text-muted group-hover:text-primary transition-colors" />
