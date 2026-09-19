@@ -45,12 +45,14 @@ export const EXAM_QUESTIONS: ExamQuestion[] = [
   // ═══════════════════════════════════════════════════════════════
   // AQA — PAPER 1
   // ═══════════════════════════════════════════════════════════════
+
   {
     id: "bio-mol-1",
     board: "aqa",
     paper: "paper1",
     topic: "Biological Molecules",
-    question: "Describe how you would test a sample of food for the presence of protein. Explain how you would interpret the results.",
+    question:
+      "Describe how you would test a sample of food for the presence of protein. Explain how you would interpret the results.",
     marks: 5,
     markScheme: [
       "Add biuret reagent / sodium hydroxide + copper sulfate",
@@ -65,7 +67,8 @@ export const EXAM_QUESTIONS: ExamQuestion[] = [
     board: "aqa",
     paper: "paper1",
     topic: "Biological Molecules",
-    question: "A triglyceride is made from one molecule of glycerol and three fatty acids. Describe the structure of a triglyceride and explain how this structure makes triglycerides suitable for their role as energy storage molecules.",
+    question:
+      "A triglyceride is made from one molecule of glycerol and three fatty acids. Describe the structure of a triglyceride and explain how this structure makes triglycerides suitable for their role as energy storage molecules.",
     marks: 6,
     markScheme: [
       "Glycerol backbone with three fatty acid chains attached by ester bonds",
@@ -81,7 +84,8 @@ export const EXAM_QUESTIONS: ExamQuestion[] = [
     board: "aqa",
     paper: "paper1",
     topic: "Biological Molecules",
-    question: "Describe how you would carry out a test to distinguish between a reducing sugar and a non-reducing sugar.",
+    question:
+      "Describe how you would carry out a test to distinguish between a reducing sugar and a non-reducing sugar.",
     marks: 4,
     markScheme: [
       "Add Benedict's reagent and heat",
@@ -90,12 +94,63 @@ export const EXAM_QUESTIONS: ExamQuestion[] = [
       "To test for non-reducing sugar: first hydrolyse with acid, neutralise, then Benedict's test",
     ],
   },
+
+  {
+    id: "bio-mol-4",
+    board: "aqa",
+    paper: "paper1",
+    topic: "Biological Molecules",
+    question:
+      "Explain how the structure of starch makes it suitable for storage of carbohydrates in plants.",
+    marks: 5,
+    markScheme: [
+      "Starch is a polysaccharide made from alpha-glucose",
+      "Amylose has alpha-1,4 glycosidic bonds and forms a coiled structure",
+      "Amylopectin has alpha-1,4 and alpha-1,6 glycosidic bonds and is branched",
+      "Compact molecule allows large amounts of glucose to be stored",
+      "Insoluble so does not affect water potential / does not readily leave cells",
+    ],
+  },
+  {
+    id: "bio-mol-5",
+    board: "aqa",
+    paper: "paper1",
+    topic: "Biological Molecules",
+    question:
+      "Describe the structure of cellulose and explain how cellulose is adapted for its role in plant cell walls.",
+    marks: 6,
+    markScheme: [
+      "Cellulose is a polysaccharide made from beta-glucose",
+      "Beta-glucose molecules joined by beta-1,4 glycosidic bonds",
+      "Alternate glucose molecules are rotated by 180 degrees",
+      "Long straight chains are produced",
+      "Hydrogen bonds form between adjacent cellulose chains",
+      "Chains form microfibrils / fibres giving high tensile strength",
+    ],
+  },
+  {
+    id: "bio-mol-6",
+    board: "aqa",
+    paper: "paper1",
+    topic: "Biological Molecules",
+    question:
+      "Explain how the structure of phospholipids allows them to form a cell surface membrane.",
+    marks: 4,
+    markScheme: [
+      "Phospholipid has glycerol, fatty acids and phosphate group",
+      "Phosphate head is hydrophilic",
+      "Fatty acid tails are hydrophobic",
+      "Phospholipids arrange into a bilayer with heads facing water and tails away from water",
+    ],
+  },
+
   {
     id: "cells-1",
     board: "aqa",
     paper: "paper1",
     topic: "Cells",
-    question: "Describe the structure of a cell surface membrane and explain how its structure is related to its functions.",
+    question:
+      "Describe the structure of a cell surface membrane and explain how its structure is related to its functions.",
     marks: 6,
     markScheme: [
       "Phospholipid bilayer with hydrophilic heads and hydrophobic tails",
@@ -111,7 +166,8 @@ export const EXAM_QUESTIONS: ExamQuestion[] = [
     board: "aqa",
     paper: "paper1",
     topic: "Cells",
-    question: "Describe the process of mitosis and explain its importance in living organisms.",
+    question:
+      "Describe the process of mitosis and explain its importance in living organisms.",
     marks: 6,
     markScheme: [
       "Prophase: chromosomes condense / become visible / nuclear envelope breaks down",
@@ -127,7 +183,8 @@ export const EXAM_QUESTIONS: ExamQuestion[] = [
     board: "aqa",
     paper: "paper1",
     topic: "Cells",
-    question: "Describe how you would use an optical microscope to measure the length of a cell.",
+    question:
+      "Describe how you would use an optical microscope to measure the length of a cell.",
     marks: 4,
     markScheme: [
       "Place stage micrometer on stage and calibrate eyepiece graticule",
@@ -136,12 +193,64 @@ export const EXAM_QUESTIONS: ExamQuestion[] = [
       "Count number of eyepiece units across cell and multiply by calibration factor",
     ],
   },
+
+  {
+    id: "cells-4",
+    board: "aqa",
+    paper: "paper1",
+    topic: "Cells",
+    question:
+      "Explain how the structure of a mitochondrion is related to its role in aerobic respiration.",
+    marks: 5,
+    markScheme: [
+      "Inner membrane folded into cristae",
+      "Cristae provide large surface area",
+      "Electron transport chain proteins / ATP synthase located in inner membrane",
+      "Matrix contains enzymes for link reaction and Krebs cycle",
+      "Mitochondrion produces ATP through oxidative phosphorylation",
+    ],
+  },
+  {
+    id: "cells-5",
+    board: "aqa",
+    paper: "paper1",
+    topic: "Cells",
+    question:
+      "Explain how the structure of a chloroplast is related to its role in photosynthesis.",
+    marks: 6,
+    markScheme: [
+      "Chloroplast surrounded by double membrane",
+      "Thylakoid membranes contain chlorophyll / photosystems",
+      "Grana provide large surface area for light-dependent reactions",
+      "Electron carriers / ATP synthase associated with thylakoid membranes",
+      "Stroma contains enzymes involved in the Calvin cycle",
+      "Chloroplast contains its own DNA / ribosomes for production of some proteins",
+    ],
+  },
+  {
+    id: "cells-6",
+    board: "aqa",
+    paper: "paper1",
+    topic: "Cells",
+    question:
+      "Describe how cells become specialised during differentiation and explain the importance of gene expression in this process.",
+    marks: 5,
+    markScheme: [
+      "Cells contain the same genetic information / genes",
+      "Different genes are expressed / switched on or off",
+      "Different proteins are produced",
+      "Proteins determine cell structure and function",
+      "Cells become specialised for particular roles",
+    ],
+  },
+
   {
     id: "exchange-1",
     board: "aqa",
     paper: "paper1",
     topic: "Organisms Exchange Substances",
-    question: "Describe and explain the differences between the gaseous exchange systems of a mammal and a fish.",
+    question:
+      "Describe and explain the differences between the gaseous exchange systems of a mammal and a fish.",
     marks: 6,
     markScheme: [
       "Mammal: tidal ventilation / air flows in and out of same pathway",
@@ -157,7 +266,8 @@ export const EXAM_QUESTIONS: ExamQuestion[] = [
     board: "aqa",
     paper: "paper1",
     topic: "Organisms Exchange Substances",
-    question: "Explain how the structure of the alveoli is adapted for gaseous exchange.",
+    question:
+      "Explain how the structure of the alveoli is adapted for gaseous exchange.",
     marks: 4,
     markScheme: [
       "Large surface area provided by many alveoli",
@@ -166,12 +276,64 @@ export const EXAM_QUESTIONS: ExamQuestion[] = [
       "Moist surface allows gases to dissolve",
     ],
   },
+
+  {
+    id: "exchange-3",
+    board: "aqa",
+    paper: "paper1",
+    topic: "Organisms Exchange Substances",
+    question:
+      "Explain how ventilation of the lungs helps maintain a concentration gradient for gas exchange.",
+    marks: 5,
+    markScheme: [
+      "Ventilation brings air with relatively high oxygen concentration to alveoli",
+      "Ventilation removes carbon dioxide from alveoli",
+      "Maintains concentration gradient between alveolar air and blood",
+      "Oxygen diffuses from alveoli into blood",
+      "Carbon dioxide diffuses from blood into alveoli",
+    ],
+  },
+  {
+    id: "exchange-4",
+    board: "aqa",
+    paper: "paper1",
+    topic: "Organisms exchange substances",
+    question:
+      "Describe how water and mineral ions are transported from the roots to the leaves of a plant.",
+    marks: 6,
+    markScheme: [
+      "Water enters root hair cells by osmosis",
+      "Mineral ions absorbed by active transport / co-transport",
+      "Water enters xylem and forms continuous column",
+      "Water evaporates from mesophyll cells during transpiration",
+      "Cohesion between water molecules maintains continuous column",
+      "Transpiration creates tension / negative pressure pulling water up xylem",
+    ],
+  },
+  {
+    id: "exchange-5",
+    board: "aqa",
+    paper: "paper1",
+    topic: "Organisms Exchange Substances",
+    question:
+      "Explain how xerophytes are adapted to reduce water loss.",
+    marks: 5,
+    markScheme: [
+      "Thick waxy cuticle reduces evaporation",
+      "Reduced number / size of stomata reduces diffusion of water vapour",
+      "Stomata may be sunken / located in pits",
+      "Leaf hairs trap moist air / reduce water vapour gradient",
+      "Leaves may be rolled / reduced in surface area",
+    ],
+  },
+
   {
     id: "genetics-1",
     board: "aqa",
     paper: "paper1",
     topic: "Genetic Information & Variation",
-    question: "Describe the process of DNA replication.",
+    question:
+      "Describe the process of DNA replication.",
     marks: 6,
     markScheme: [
       "Helicase unwinds / unzips the double helix / breaks hydrogen bonds",
@@ -187,7 +349,8 @@ export const EXAM_QUESTIONS: ExamQuestion[] = [
     board: "aqa",
     paper: "paper1",
     topic: "Genetic Information & Variation",
-    question: "Explain how meiosis results in genetic variation.",
+    question:
+      "Explain how meiosis results in genetic variation.",
     marks: 6,
     markScheme: [
       "Crossing over between homologous chromosomes in prophase I",
@@ -199,15 +362,68 @@ export const EXAM_QUESTIONS: ExamQuestion[] = [
     ],
   },
 
+  {
+    id: "genetics-3",
+    board: "aqa",
+    paper: "paper1",
+    topic: "Genetic Information & Variation",
+    question:
+      "Describe the structure of DNA and explain how its structure allows it to store genetic information.",
+    marks: 6,
+    markScheme: [
+      "DNA is a polymer made from nucleotides",
+      "Each nucleotide contains deoxyribose, phosphate and organic base",
+      "Two polynucleotide strands form a double helix",
+      "Hydrogen bonds form between complementary bases",
+      "A pairs with T and C pairs with G",
+      "Base sequence carries the genetic information / code",
+    ],
+  },
+  {
+    id: "genetics-4",
+    board: "aqa",
+    paper: "paper1",
+    topic: "Genetic Information & Variation",
+    question:
+      "Explain how DNA replication ensures that genetic information can be passed to daughter cells.",
+    marks: 5,
+    markScheme: [
+      "Hydrogen bonds between complementary bases are broken",
+      "Each original strand acts as a template",
+      "Complementary nucleotides join to each template strand",
+      "Each DNA molecule contains one original and one new strand",
+      "Daughter cells receive an identical copy of the genetic information",
+    ],
+  },
+  {
+    id: "genetics-5",
+    board: "aqa",
+    paper: "paper1",
+    topic: "Genetic Information & Variation",
+    question:
+      "Explain how genetic variation can arise during meiosis and fertilisation.",
+    marks: 6,
+    markScheme: [
+      "Crossing over produces new combinations of alleles",
+      "Occurs between non-sister chromatids of homologous chromosomes",
+      "Independent assortment produces different combinations of maternal and paternal chromosomes",
+      "Different combinations enter gametes",
+      "Random fertilisation means any sperm may fuse with any egg",
+      "Offspring therefore have different combinations of alleles",
+    ],
+  },
+
   // ═══════════════════════════════════════════════════════════════
   // AQA — PAPER 2
   // ═══════════════════════════════════════════════════════════════
+
   {
     id: "energy-1",
     board: "aqa",
     paper: "paper2",
     topic: "Energy Transfers",
-    question: "Describe how energy is transferred from light energy to chemical energy in photosynthesis.",
+    question:
+      "Describe how energy is transferred from light energy to chemical energy in photosynthesis.",
     marks: 6,
     markScheme: [
       "Light energy absorbed by chlorophyll / photosystems in thylakoid membranes",
@@ -223,7 +439,8 @@ export const EXAM_QUESTIONS: ExamQuestion[] = [
     board: "aqa",
     paper: "paper2",
     topic: "Energy Transfers",
-    question: "Describe the process of glycolysis.",
+    question:
+      "Describe the process of glycolysis.",
     marks: 4,
     markScheme: [
       "Glucose phosphorylated using ATP to form hexose bisphosphate",
@@ -232,12 +449,80 @@ export const EXAM_QUESTIONS: ExamQuestion[] = [
       "Hydrogen accepted by NAD / net gain of 2 ATP / 2 pyruvate produced",
     ],
   },
+
+  {
+    id: "energy-3",
+    board: "aqa",
+    paper: "paper2",
+    topic: "Energy Transfers",
+    question:
+      "Describe what happens during the link reaction and explain its importance in aerobic respiration.",
+    marks: 5,
+    markScheme: [
+      "Pyruvate enters mitochondrial matrix",
+      "Pyruvate is decarboxylated / carbon dioxide removed",
+      "Hydrogen is removed / pyruvate is oxidised",
+      "Hydrogen accepted by NAD to form reduced NAD",
+      "Two-carbon acetate combines with coenzyme A to form acetyl coenzyme A",
+    ],
+  },
+  {
+    id: "energy-4",
+    board: "aqa",
+    paper: "paper2",
+    topic: "Energy Transfers",
+    question:
+      "Describe the main events of the Krebs cycle and explain how it contributes to ATP production.",
+    marks: 6,
+    markScheme: [
+      "Acetyl coenzyme A combines with a four-carbon compound",
+      "Six-carbon compound formed and then oxidised",
+      "Carbon dioxide released by decarboxylation",
+      "Hydrogen removed and transferred to NAD / FAD",
+      "A small amount of ATP produced by substrate-level phosphorylation",
+      "Reduced NAD / reduced FAD deliver electrons to the electron transport chain",
+    ],
+  },
+  {
+    id: "energy-5",
+    board: "aqa",
+    paper: "paper2",
+    topic: "Energy Transfers",
+    question:
+      "Explain how oxidative phosphorylation results in the production of ATP.",
+    marks: 6,
+    markScheme: [
+      "Reduced NAD / reduced FAD donate electrons to electron transport chain",
+      "Electrons pass through carriers in inner mitochondrial membrane",
+      "Energy released is used to pump protons across the membrane",
+      "Creates a proton concentration gradient / electrochemical gradient",
+      "Protons diffuse back through ATP synthase",
+      "Energy from proton movement drives phosphorylation of ADP to ATP",
+    ],
+  },
+  {
+    id: "energy-6",
+    board: "aqa",
+    paper: "paper2",
+    topic: "Energy Transfers",
+    question:
+      "Explain why anaerobic respiration produces less ATP than aerobic respiration.",
+    marks: 4,
+    markScheme: [
+      "Anaerobic respiration only involves glycolysis",
+      "Glycolysis produces a net gain of 2 ATP per glucose",
+      "Krebs cycle and oxidative phosphorylation do not occur",
+      "No electron transport chain / no large proton gradient formed",
+    ],
+  },
+
   {
     id: "response-1",
     board: "aqa",
     paper: "paper2",
     topic: "Organisms Respond to Changes",
-    question: "Describe how a nerve impulse is transmitted along a motor neurone.",
+    question:
+      "Describe how a nerve impulse is transmitted along a motor neurone.",
     marks: 6,
     markScheme: [
       "Resting potential maintained by sodium-potassium pump and K+ leak channels",
@@ -253,7 +538,8 @@ export const EXAM_QUESTIONS: ExamQuestion[] = [
     board: "aqa",
     paper: "paper2",
     topic: "Organisms Respond to Changes",
-    question: "Explain how the structure of a sarcomere is related to its function in muscle contraction.",
+    question:
+      "Explain how the structure of a sarcomere is related to its function in muscle contraction.",
     marks: 4,
     markScheme: [
       "Thick filaments (myosin) and thin filaments (actin) arranged in parallel",
@@ -262,12 +548,65 @@ export const EXAM_QUESTIONS: ExamQuestion[] = [
       "Sliding filament mechanism / myosin heads bind to actin and pull thin filaments inward",
     ],
   },
+
+  {
+    id: "response-3",
+    board: "aqa",
+    paper: "paper2",
+    topic: "Organisms Respond to Changes",
+    question:
+      "Explain how a synapse ensures that a nerve impulse passes in one direction.",
+    marks: 5,
+    markScheme: [
+      "Action potential arrives at presynaptic membrane",
+      "Calcium ions enter presynaptic knob",
+      "Synaptic vesicles fuse with membrane and release neurotransmitter",
+      "Neurotransmitter diffuses across synaptic cleft and binds to receptors",
+      "Receptors are only present on postsynaptic membrane / neurotransmitter broken down or removed",
+    ],
+  },
+  {
+    id: "response-4",
+    board: "aqa",
+    paper: "paper2",
+    topic: "Organisms Respond to Changes",
+    question:
+      "Explain how the sliding filament mechanism causes a muscle fibre to contract.",
+    marks: 6,
+    markScheme: [
+      "Calcium ions released from sarcoplasmic reticulum",
+      "Calcium binds to troponin",
+      "Tropomyosin moves to expose binding sites on actin",
+      "Myosin heads attach to actin forming cross-bridges",
+      "ATP provides energy for myosin head movement / detachment",
+      "Actin is pulled towards the centre of the sarcomere and sarcomere shortens",
+    ],
+  },
+  {
+    id: "response-5",
+    board: "aqa",
+    paper: "paper2",
+    topic: "Organisms Respond to Changes",
+    question:
+      "Describe how the kidneys help regulate the water potential of the blood.",
+    marks: 6,
+    markScheme: [
+      "Water potential detected by osmoreceptors in hypothalamus",
+      "Changes cause changes in secretion of ADH",
+      "ADH travels in blood to kidneys",
+      "ADH increases permeability of collecting ducts",
+      "More aquaporins inserted into collecting duct membranes",
+      "More water reabsorbed by osmosis and concentrated urine produced",
+    ],
+  },
+
   {
     id: "evo-1",
     board: "aqa",
     paper: "paper2",
     topic: "Genetics, Populations & Evolution",
-    question: "Explain how natural selection can lead to evolution.",
+    question:
+      "Explain how natural selection can lead to evolution.",
     marks: 6,
     markScheme: [
       "Variation exists within population due to mutation / genetic differences",
@@ -283,7 +622,8 @@ export const EXAM_QUESTIONS: ExamQuestion[] = [
     board: "aqa",
     paper: "paper2",
     topic: "Genetics, Populations & Evolution",
-    question: "Describe the process of transcription.",
+    question:
+      "Describe the process of transcription.",
     marks: 5,
     markScheme: [
       "DNA helicase unwinds DNA double helix / hydrogen bonds break",
@@ -293,12 +633,63 @@ export const EXAM_QUESTIONS: ExamQuestion[] = [
       "Introns removed / splicing / mRNA leaves nucleus through nuclear pore",
     ],
   },
+
+  {
+    id: "evo-3",
+    board: "aqa",
+    paper: "paper2",
+    topic: "Genetics, Populations & Evolution",
+    question:
+      "Explain how selection pressures can cause changes in allele frequency within a population.",
+    marks: 5,
+    markScheme: [
+      "Population contains genetic variation",
+      "Selection pressure affects survival / reproductive success",
+      "Individuals with advantageous alleles more likely to survive",
+      "These individuals reproduce and pass alleles to offspring",
+      "Frequency of advantageous allele increases over generations",
+    ],
+  },
+  {
+    id: "evo-4",
+    board: "aqa",
+    paper: "paper2",
+    topic: "Genetics, Populations & Evolution",
+    question:
+      "Explain how reproductive isolation can contribute to speciation.",
+    marks: 6,
+    markScheme: [
+      "Population becomes separated / isolated",
+      "No gene flow between isolated populations",
+      "Different selection pressures / mutations occur",
+      "Allele frequencies change independently",
+      "Genetic differences accumulate",
+      "Populations become reproductively isolated and can no longer produce fertile offspring",
+    ],
+  },
+  {
+    id: "evo-5",
+    board: "aqa",
+    paper: "paper2",
+    topic: "Genetics, Populations & Evolution",
+    question:
+      "Explain how genetic drift can change the allele frequencies of a population.",
+    marks: 4,
+    markScheme: [
+      "Random changes in allele frequency",
+      "More significant in small populations",
+      "Some alleles may become lost or fixed by chance",
+      "Does not necessarily depend on whether an allele provides an advantage",
+    ],
+  },
+
   {
     id: "gene-1",
     board: "aqa",
     paper: "paper2",
     topic: "Control of Gene Expression",
-    question: "Explain how a mutation in a gene can lead to a change in the phenotype of an organism.",
+    question:
+      "Explain how a mutation in a gene can lead to a change in the phenotype of an organism.",
     marks: 6,
     markScheme: [
       "Mutation changes DNA base sequence",
@@ -314,7 +705,8 @@ export const EXAM_QUESTIONS: ExamQuestion[] = [
     board: "aqa",
     paper: "paper2",
     topic: "Control of Gene Expression",
-    question: "Describe the role of transcription factors in controlling gene expression.",
+    question:
+      "Describe the role of transcription factors in controlling gene expression.",
     marks: 4,
     markScheme: [
       "Transcription factors bind to specific DNA sequences near promoter",
@@ -324,15 +716,67 @@ export const EXAM_QUESTIONS: ExamQuestion[] = [
     ],
   },
 
+  {
+    id: "gene-3",
+    board: "aqa",
+    paper: "paper2",
+    topic: "Control of Gene Expression",
+    question:
+      "Explain how epigenetic changes can affect gene expression.",
+    marks: 5,
+    markScheme: [
+      "Epigenetic changes do not alter the base sequence of DNA",
+      "DNA methylation can occur",
+      "Methylation can prevent transcription factors / RNA polymerase binding",
+      "Histone modification can alter how tightly DNA is associated with histones",
+      "Changes in DNA accessibility alter whether genes are expressed",
+    ],
+  },
+  {
+    id: "gene-4",
+    board: "aqa",
+    paper: "paper2",
+    topic: "Control of Gene Expression",
+    question:
+      "Explain how a mutation in a regulatory region of DNA could affect the phenotype of an organism.",
+    marks: 5,
+    markScheme: [
+      "Mutation changes base sequence of regulatory DNA",
+      "Transcription factor may no longer bind / may bind more strongly",
+      "Rate of transcription changes",
+      "Amount of mRNA and protein produced changes",
+      "Altered protein amount can change cell function / phenotype",
+    ],
+  },
+  {
+    id: "gene-5",
+    board: "aqa",
+    paper: "paper2",
+    topic: "Control of Gene Expression",
+    question:
+      "Describe how a polypeptide is produced from a gene, including transcription and translation.",
+    marks: 6,
+    markScheme: [
+      "DNA unwinds and hydrogen bonds break",
+      "RNA polymerase joins complementary RNA nucleotides during transcription",
+      "mRNA leaves nucleus through a nuclear pore",
+      "mRNA attaches to a ribosome",
+      "tRNA molecules bring amino acids according to complementary anticodons",
+      "Peptide bonds form between amino acids to produce a polypeptide",
+    ],
+  },
+
   // ═══════════════════════════════════════════════════════════════
   // CIE — PAPER 2 ONLY (AS Level, 2025–2027 syllabus)
   // ═══════════════════════════════════════════════════════════════
+
   {
     id: "cie-p2-cell-1",
     board: "cie",
     paper: "paper2",
     topic: "Cell Structure",
-    question: "Fig. 1.1 is a drawing of a mesophyll cell from a leaf. Describe the functions of the organelles labelled A and B, and explain how each is adapted to carry out its function.",
+    question:
+      "Fig. 1.1 is a drawing of a mesophyll cell from a leaf. Describe the functions of the organelles labelled A and B, and explain how each is adapted to carry out its function.",
     marks: 6,
     markScheme: [
       "A = chloroplast: site of photosynthesis / contains chlorophyll",
@@ -348,7 +792,8 @@ export const EXAM_QUESTIONS: ExamQuestion[] = [
     board: "cie",
     paper: "paper2",
     topic: "Cell Structure",
-    question: "Describe the differences between the structure of a prokaryotic cell and a eukaryotic cell.",
+    question:
+      "Describe the differences between the structure of a prokaryotic cell and a eukaryotic cell.",
     marks: 5,
     markScheme: [
       "Prokaryote has no nucleus / nucleoid region contains naked DNA",
@@ -363,7 +808,8 @@ export const EXAM_QUESTIONS: ExamQuestion[] = [
     board: "cie",
     paper: "paper2",
     topic: "Biological Molecules",
-    question: "Describe the structure of a glucose molecule and explain how glucose molecules are joined together to form starch.",
+    question:
+      "Describe the structure of a glucose molecule and explain how glucose molecules are joined together to form starch.",
     marks: 5,
     markScheme: [
       "Glucose is a monosaccharide / hexose sugar / 6 carbon atoms",
@@ -378,7 +824,8 @@ export const EXAM_QUESTIONS: ExamQuestion[] = [
     board: "cie",
     paper: "paper2",
     topic: "Enzymes",
-    question: "Explain how enzymes lower the activation energy of a reaction.",
+    question:
+      "Explain how enzymes lower the activation energy of a reaction.",
     marks: 4,
     markScheme: [
       "Enzyme has active site with specific shape complementary to substrate",
@@ -392,7 +839,8 @@ export const EXAM_QUESTIONS: ExamQuestion[] = [
     board: "cie",
     paper: "paper2",
     topic: "Cell Membranes & Transport",
-    question: "Explain the process of facilitated diffusion across a cell surface membrane.",
+    question:
+      "Explain the process of facilitated diffusion across a cell surface membrane.",
     marks: 4,
     markScheme: [
       "Movement of molecules down a concentration gradient",
@@ -406,7 +854,8 @@ export const EXAM_QUESTIONS: ExamQuestion[] = [
     board: "cie",
     paper: "paper2",
     topic: "The Mitotic Cell Cycle",
-    question: "Describe the events that occur during anaphase of mitosis and explain the importance of mitosis in multicellular organisms.",
+    question:
+      "Describe the events that occur during anaphase of mitosis and explain the importance of mitosis in multicellular organisms.",
     marks: 5,
     markScheme: [
       "Sister chromatids separate at centromere",
@@ -421,7 +870,8 @@ export const EXAM_QUESTIONS: ExamQuestion[] = [
     board: "cie",
     paper: "paper2",
     topic: "Transport in Plants",
-    question: "Explain how water moves from the soil to the xylem in the roots of a plant.",
+    question:
+      "Explain how water moves from the soil to the xylem in the roots of a plant.",
     marks: 5,
     markScheme: [
       "Water moves by osmosis from soil into root hair cells",
@@ -436,7 +886,8 @@ export const EXAM_QUESTIONS: ExamQuestion[] = [
     board: "cie",
     paper: "paper2",
     topic: "Transport in Mammals",
-    question: "Describe the structure of the mammalian heart and explain how the structure is related to its function.",
+    question:
+      "Describe the structure of the mammalian heart and explain how the structure is related to its function.",
     marks: 6,
     markScheme: [
       "Four chambers / two atria and two ventricles",
@@ -452,7 +903,8 @@ export const EXAM_QUESTIONS: ExamQuestion[] = [
     board: "cie",
     paper: "paper2",
     topic: "Gas Exchange",
-    question: "Describe the features of gas exchange surfaces in mammals and explain how each feature is adapted for efficient gas exchange.",
+    question:
+      "Describe the features of gas exchange surfaces in mammals and explain how each feature is adapted for efficient gas exchange.",
     marks: 5,
     markScheme: [
       "Large surface area provided by many alveoli",
@@ -467,7 +919,8 @@ export const EXAM_QUESTIONS: ExamQuestion[] = [
     board: "cie",
     paper: "paper2",
     topic: "Infectious Disease",
-    question: "Explain how the immune system responds to a bacterial infection.",
+    question:
+      "Explain how the immune system responds to a bacterial infection.",
     marks: 6,
     markScheme: [
       "Antigens on bacterial surface recognised as foreign",
@@ -483,7 +936,8 @@ export const EXAM_QUESTIONS: ExamQuestion[] = [
     board: "cie",
     paper: "paper2",
     topic: "Immunity",
-    question: "Explain how vaccination protects an individual against an infectious disease.",
+    question:
+      "Explain how vaccination protects an individual against an infectious disease.",
     marks: 5,
     markScheme: [
       "Vaccine contains weakened / dead pathogen or antigen",

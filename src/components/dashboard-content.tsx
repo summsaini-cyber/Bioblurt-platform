@@ -5,7 +5,7 @@ import Link from "next/link";
 import { createClient } from "@/lib/supabase";
 import { AQA_TOPICS, getAllSpecPoints } from "@/lib/spec-data";
 import { getRagStatus, getEffectiveRank } from "@/lib/scoring-engine";
-import { BookOpen, ArrowRight, Zap, Trophy } from "lucide-react";
+import { BookOpen, ArrowRight, Zap, Trophy, Calculator } from "lucide-react";
 
 interface BlurtRow {
   topic: string;
@@ -214,6 +214,23 @@ export default function DashboardContent({ userId }: { userId: string }) {
             </div>
           </div>
         )}
+      </div>
+
+      {/* Maths Questions */}
+      <div className="dashboard-card">
+        <div className="flex items-center gap-3 mb-3">
+          <Calculator className="w-5 h-5 text-muted" />
+          <div>
+            <h3 className="font-semibold text-lg">Maths Questions</h3>
+            <p className="text-sm text-muted">Practise AQA Biology maths skills</p>
+          </div>
+        </div>
+        <Link
+          href="/maths-questions"
+          className="btn-primary w-full flex items-center justify-center gap-2"
+        >
+          Start Maths Questions <ArrowRight className="w-4 h-4" />
+        </Link>
       </div>
 
       {/* Topic Progress */}
