@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import {
   ArrowLeft,
   ArrowRight,
+  BarChart3,
   Calculator,
   Check,
   ChevronDown,
@@ -12,6 +13,8 @@ import {
   RotateCcw,
   Search,
   Shuffle,
+  Target,
+  TrendingUp,
   X,
   XCircle,
 } from "lucide-react";
@@ -53,13 +56,19 @@ const MARK_OPTIONS = [
   { label: "5+ marks", value: "5+" },
 ];
 
-type Screen = "selection" | "question" | "results" | "review";
+type Screen =
+  | "selection"
+  | "question"
+  | "results"
+  | "review"
+  | "progress";
 
 type Attempt = {
   questionId: string;
   correct: boolean;
   answer: string;
   time: number;
+  createdAt: string;
 };
 
 const HISTORY_KEY = "bioblurt-maths-question-history";
@@ -99,7 +108,18 @@ export default function MathsQuestionsContent() {
       const saved = window.localStorage.getItem(HISTORY_KEY);
 
       if (saved) {
-        setHistory(JSON.parse(saved));
+        const parsed = JSON.parse(saved);
+
+        if (Array.isArray(parsed)) {
+          setHistory(
+            parsed.map((attempt) => ({
+              ...attempt,
+              createdAt:
+                attempt.createdAt ??
+                new Date().toISOString(),
+            }))
+          );
+        }
       }
     } catch {
       setHistory([]);
@@ -123,6 +143,117 @@ export default function MathsQuestionsContent() {
         .map((attempt) => attempt.questionId)
     );
   }, [history]);
+
+  const skillStats = useMemo(() => {
+    return MATHS_SKILLS.filter(
+      (item) => item !== "All maths skills"
+    )
+      .map((mathsSkill) => {
+        const attempts = history.filter((attempt) => {
+          const question = MATHS_QUESTIONS.find(
+            (item) => item.id === attempt.questionId
+          );
+
+          return question?.mathsSkill === mathsSkill;
+        });
+
+        const correct = attempts.filter(
+          (attempt) => attempt.correct
+        ).length;
+
+        const possibleMarks = attempts.reduce((sum, attempt) => {
+          const question = MATHS_QUESTIONS.find(
+            (item) => item.id === attempt.questionId
+          );
+
+          return sum + (question?.marks ?? 0);
+        }, 0);
+
+        const gainedMarks = attempts.reduce((sum, attempt) => {
+          if (!attempt.correct) return sum;
+
+          const question = MATHS_QUESTIONS.find(
+            (item) => item.id === attempt.questionId
+          );
+
+          return sum + (question?.marks ?? 0);
+        }, 0);
+
+        return {
+          skill: mathsSkill,
+          attempts: attempts.length,
+          correct,
+          accuracy: attempts.length
+            ? Math.round((correct / attempts.length) * 100)
+            : 0,
+          possibleMarks,
+          gainedMarks,
+        };
+      })
+      .filter((item) => item.attempts > 0);
+  }, [history]);
+
+  const weakestSkill = useMemo(() => {
+    if (!skillStats.length) return null;
+
+    return [...skillStats].sort((a, b) => {
+      if (a.accuracy !== b.accuracy) {
+        return a.accuracy - b.accuracy;
+      }
+
+      return b.attempts - a.attempts;
+    })[0];
+  }, [skillStats]);
+
+  const totalMarks = useMemo(() => {
+    return history.reduce((sum, attempt) => {
+      const question = MATHS_QUESTIONS.find(
+        (item) => item.id === attempt.questionId
+      );
+
+      return sum + (question?.marks ?? 0);
+    }, 0);
+  }, [history]);
+
+  const gainedMarks = useMemo(() => {
+    return history.reduce((sum, attempt) => {
+      if (!attempt.correct) return sum;
+
+      const question = MATHS_QUESTIONS.find(
+        (item) => item.id === attempt.questionId
+      );
+
+      return sum + (question?.marks ?? 0);
+    }, 0);
+  }, [history]);
+
+  const overallAccuracy = history.length
+    ? Math.round(
+        (history.filter((attempt) => attempt.correct).length /
+          history.length) *
+          100
+      )
+    : 0;
+
+  const recentHistory = useMemo(() => {
+    return [...history]
+      .sort(
+        (a, b) =>
+          new Date(b.createdAt).getTime() -
+          new Date(a.createdAt).getTime()
+      )
+      .slice(0, 10);
+  }, [history]);
+
+  const recentAccuracy = useMemo(() => {
+    if (!recentHistory.length) return 0;
+
+    return Math.round(
+      (recentHistory.filter((attempt) => attempt.correct).length /
+        recentHistory.length) *
+        100
+    );
+  }, [recentHistory]);
 
   const activeFilters = useMemo(() => {
     let count = 0;
@@ -238,6 +369,43 @@ export default function MathsQuestionsContent() {
     setScreen("question");
   }
 
+  function startWeakAreas() {
+    if (!weakestSkill) return;
+
+    const weakQuestionIds = new Set(
+      history
+        .filter((attempt) => !attempt.correct)
+        .map((attempt) => attempt.questionId)
+    );
+
+    const weakSkillQuestions = MATHS_QUESTIONS.filter(
+      (question) =>
+        question.mathsSkill === weakestSkill.skill
+    );
+
+    const wrongFirst = [...weakSkillQuestions].sort((a, b) => {
+      const aWrong = weakQuestionIds.has(a.id) ? 0 : 1;
+      const bWrong = weakQuestionIds.has(b.id) ? 0 : 1;
+
+      return aWrong - bWrong;
+    });
+
+    const selected = wrongFirst.slice(
+      0,
+      Math.min(Number(numberOfQuestions), wrongFirst.length)
+    );
+
+    if (!selected.length) return;
+
+    setSelectedQuestionIds(selected.map((question) => question.id));
+    setCurrentIndex(0);
+    setSessionResults([]);
+    setElapsedSeconds(0);
+    setQuestionStartedAt(Date.now());
+    resetAnswer();
+    setScreen("question");
+  }
+
   function getSubmittedValue() {
     if (!currentQuestion) return NaN;
 
@@ -302,6 +470,7 @@ export default function MathsQuestionsContent() {
           ? `${standardFormCoefficient} × 10^${standardFormExponent}`
           : answer,
       time: timeTaken,
+      createdAt: new Date().toISOString(),
     };
 
     setIsCorrect(correct);
@@ -398,6 +567,23 @@ export default function MathsQuestionsContent() {
     );
   }
 
+  if (screen === "progress") {
+    return (
+      <ProgressScreen
+        history={history}
+        skillStats={skillStats}
+        weakestSkill={weakestSkill}
+        overallAccuracy={overallAccuracy}
+        totalMarks={totalMarks}
+        gainedMarks={gainedMarks}
+        recentHistory={recentHistory}
+        recentAccuracy={recentAccuracy}
+        onBack={() => setScreen("selection")}
+        onFixWeakAreas={startWeakAreas}
+      />
+    );
+  }
+
   return (
     <SelectionScreen
       topic={topic}
@@ -419,6 +605,11 @@ export default function MathsQuestionsContent() {
       wrongCount={wrongQuestionIds.size}
       clearFilters={clearFilters}
       startQuestions={startQuestions}
+      historyCount={history.length}
+      overallAccuracy={overallAccuracy}
+      onProgress={() => setScreen("progress")}
+      onFixWeakAreas={startWeakAreas}
+      weakestSkill={weakestSkill}
     />
   );
 }
@@ -443,6 +634,11 @@ function SelectionScreen({
   wrongCount,
   clearFilters,
   startQuestions,
+  historyCount,
+  overallAccuracy,
+  onProgress,
+  onFixWeakAreas,
+  weakestSkill,
 }: {
   topic: string;
   setTopic: (value: string) => void;
@@ -463,6 +659,18 @@ function SelectionScreen({
   wrongCount: number;
   clearFilters: () => void;
   startQuestions: () => void;
+  historyCount: number;
+  overallAccuracy: number;
+  onProgress: () => void;
+  onFixWeakAreas: () => void;
+  weakestSkill: {
+    skill: string;
+    attempts: number;
+    correct: number;
+    accuracy: number;
+    possibleMarks: number;
+    gainedMarks: number;
+  } | null;
 }) {
   const requested = Number(numberOfQuestions);
   const available = Math.min(requested, filteredQuestions.length);
@@ -483,6 +691,97 @@ function SelectionScreen({
           </div>
         </div>
       </div>
+
+      {historyCount > 0 && (
+        <div className="grid sm:grid-cols-3 gap-4">
+          <button
+            onClick={onProgress}
+            className="dashboard-card text-left hover:border-primary/40 transition-colors"
+          >
+            <div className="flex items-center gap-3">
+              <BarChart3 className="w-5 h-5 text-primary" />
+
+              <div>
+                <p className="text-xs text-muted">
+                  Questions attempted
+                </p>
+
+                <p className="text-xl font-bold mt-1">
+                  {historyCount}
+                </p>
+              </div>
+            </div>
+          </button>
+
+          <button
+            onClick={onProgress}
+            className="dashboard-card text-left hover:border-primary/40 transition-colors"
+          >
+            <div className="flex items-center gap-3">
+              <TrendingUp className="w-5 h-5 text-primary" />
+
+              <div>
+                <p className="text-xs text-muted">
+                  Overall accuracy
+                </p>
+
+                <p className="text-xl font-bold mt-1">
+                  {overallAccuracy}%
+                </p>
+              </div>
+            </div>
+          </button>
+
+          <button
+            onClick={onProgress}
+            className="dashboard-card text-left hover:border-primary/40 transition-colors"
+          >
+            <div className="flex items-center gap-3">
+              <Target className="w-5 h-5 text-primary" />
+
+              <div>
+                <p className="text-xs text-muted">
+                  Weakest skill
+                </p>
+
+                <p className="text-sm font-bold mt-1">
+                  {weakestSkill?.skill ?? "Not enough data"}
+                </p>
+              </div>
+            </div>
+          </button>
+        </div>
+      )}
+
+      {weakestSkill && (
+        <div className="dashboard-card border-primary/30 bg-primary/5">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+            <div>
+              <div className="flex items-center gap-2">
+                <Target className="w-5 h-5 text-primary" />
+
+                <h2 className="font-semibold">
+                  Fix your weakest area
+                </h2>
+              </div>
+
+              <p className="text-sm text-muted mt-2">
+                {weakestSkill.skill} · {weakestSkill.accuracy}% accuracy
+                across {weakestSkill.attempts} attempt
+                {weakestSkill.attempts === 1 ? "" : "s"}.
+              </p>
+            </div>
+
+            <button
+              onClick={onFixWeakAreas}
+              className="btn-primary flex items-center justify-center gap-2 shrink-0"
+            >
+              <Target className="w-4 h-4" />
+              Fix weak area
+            </button>
+          </div>
+        </div>
+      )}
 
       <div className="dashboard-card space-y-6">
         <div>
@@ -694,28 +993,6 @@ function SelectionScreen({
             <Shuffle className="w-4 h-4" />
             Start {available} Questions
           </button>
-        </div>
-      </div>
-
-      <div className="dashboard-card">
-        <div className="flex items-center gap-4">
-          <div className="w-10 h-10 rounded-xl bg-surface border border-border flex items-center justify-center">
-            <RotateCcw className="w-5 h-5 text-muted" />
-          </div>
-
-          <div>
-            <h2 className="font-semibold">
-              Previously wrong questions
-            </h2>
-
-            <p className="text-sm text-muted mt-1">
-              {wrongCount > 0
-                ? `${wrongCount} question${
-                    wrongCount === 1 ? "" : "s"
-                  } saved from previous attempts.`
-                : "Questions you get wrong will appear here."}
-            </p>
-          </div>
         </div>
       </div>
     </div>
@@ -1119,6 +1396,260 @@ function ReviewScreen({
           </p>
         </div>
       </div>
+    </div>
+  );
+}
+
+function ProgressScreen({
+  history,
+  skillStats,
+  weakestSkill,
+  overallAccuracy,
+  totalMarks,
+  gainedMarks,
+  recentHistory,
+  recentAccuracy,
+  onBack,
+  onFixWeakAreas,
+}: {
+  history: Attempt[];
+  skillStats: {
+    skill: string;
+    attempts: number;
+    correct: number;
+    accuracy: number;
+    possibleMarks: number;
+    gainedMarks: number;
+  }[];
+  weakestSkill: {
+    skill: string;
+    attempts: number;
+    correct: number;
+    accuracy: number;
+    possibleMarks: number;
+    gainedMarks: number;
+  } | null;
+  overallAccuracy: number;
+  totalMarks: number;
+  gainedMarks: number;
+  recentHistory: Attempt[];
+  recentAccuracy: number;
+  onBack: () => void;
+  onFixWeakAreas: () => void;
+}) {
+  return (
+    <div className="space-y-6 pb-10">
+      <button
+        onClick={onBack}
+        className="flex items-center gap-2 text-sm text-muted hover:text-text-primary"
+      >
+        <ArrowLeft className="w-4 h-4" />
+        Back to Maths Questions
+      </button>
+
+      <div>
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center">
+            <BarChart3 className="w-5 h-5 text-primary" />
+          </div>
+
+          <div>
+            <h1 className="text-2xl font-bold">
+              Maths Progress
+            </h1>
+
+            <p className="text-sm text-muted mt-1">
+              Track your Maths performance and target weak areas.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+        <ProgressCard
+          label="Questions attempted"
+          value={history.length.toString()}
+        />
+
+        <ProgressCard
+          label="Accuracy"
+          value={`${overallAccuracy}%`}
+        />
+
+        <ProgressCard
+          label="Marks gained"
+          value={`${gainedMarks}/${totalMarks}`}
+        />
+
+        <ProgressCard
+          label="Recent accuracy"
+          value={`${recentAccuracy}%`}
+        />
+      </div>
+
+      {weakestSkill && (
+        <div className="dashboard-card border-primary/30 bg-primary/5">
+          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-5">
+            <div>
+              <div className="flex items-center gap-2">
+                <Target className="w-5 h-5 text-primary" />
+
+                <h2 className="font-semibold">
+                  Weakest area
+                </h2>
+              </div>
+
+              <p className="text-xl font-bold mt-3">
+                {weakestSkill.skill}
+              </p>
+
+              <p className="text-sm text-muted mt-1">
+                {weakestSkill.accuracy}% accuracy across{" "}
+                {weakestSkill.attempts} attempt
+                {weakestSkill.attempts === 1 ? "" : "s"}.
+              </p>
+            </div>
+
+            <button
+              onClick={onFixWeakAreas}
+              className="btn-primary flex items-center justify-center gap-2"
+            >
+              <Target className="w-4 h-4" />
+              Fix my weak area
+            </button>
+          </div>
+        </div>
+      )}
+
+      <div className="dashboard-card">
+        <div className="flex items-center gap-2">
+          <BarChart3 className="w-4 h-4 text-primary" />
+
+          <h2 className="font-semibold">
+            Maths skill performance
+          </h2>
+        </div>
+
+        <p className="text-sm text-muted mt-1">
+          Based on your completed questions.
+        </p>
+
+        <div className="mt-6 space-y-5">
+          {skillStats.map((item) => (
+            <div key={item.skill}>
+              <div className="flex items-center justify-between gap-4">
+                <div>
+                  <p className="text-sm font-medium">
+                    {item.skill}
+                  </p>
+
+                  <p className="text-xs text-muted mt-1">
+                    {item.correct}/{item.attempts} correct ·{" "}
+                    {item.gainedMarks}/{item.possibleMarks} marks
+                  </p>
+                </div>
+
+                <span className="text-sm font-semibold">
+                  {item.accuracy}%
+                </span>
+              </div>
+
+              <div className="mt-2 h-2 rounded-full bg-surface border border-border overflow-hidden">
+                <div
+                  className={`h-full rounded-full ${
+                    item.accuracy < 50
+                      ? "bg-red"
+                      : item.accuracy < 75
+                      ? "bg-primary/60"
+                      : "bg-primary"
+                  }`}
+                  style={{
+                    width: `${item.accuracy}%`,
+                  }}
+                />
+              </div>
+            </div>
+          ))}
+
+          {!skillStats.length && (
+            <p className="text-sm text-muted">
+              Complete some Maths questions to see skill
+              performance.
+            </p>
+          )}
+        </div>
+      </div>
+
+      <div className="dashboard-card">
+        <div className="flex items-center gap-2">
+          <TrendingUp className="w-4 h-4 text-primary" />
+
+          <h2 className="font-semibold">
+            Recent progress
+          </h2>
+        </div>
+
+        <p className="text-sm text-muted mt-1">
+          Your last 10 attempts, newest first.
+        </p>
+
+        <div className="mt-5 space-y-3">
+          {recentHistory.map((attempt, index) => {
+            const question = MATHS_QUESTIONS.find(
+              (item) => item.id === attempt.questionId
+            );
+
+            if (!question) return null;
+
+            return (
+              <div
+                key={`${attempt.questionId}-${attempt.createdAt}-${index}`}
+                className="flex items-center justify-between gap-4 border-b border-border last:border-0 pb-3 last:pb-0"
+              >
+                <div className="min-w-0">
+                  <p className="text-sm font-medium truncate">
+                    {question.mathsSkill}
+                  </p>
+
+                  <p className="text-xs text-muted mt-1">
+                    {question.year} · Q{question.questionNumber}
+                  </p>
+                </div>
+
+                <div className="flex items-center gap-3 shrink-0">
+                  <span className="text-xs text-muted">
+                    {formatStaticTime(attempt.time)}
+                  </span>
+
+                  {attempt.correct ? (
+                    <Check className="w-4 h-4 text-green" />
+                  ) : (
+                    <XCircle className="w-4 h-4 text-red" />
+                  )}
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function ProgressCard({
+  label,
+  value,
+}: {
+  label: string;
+  value: string;
+}) {
+  return (
+    <div className="dashboard-card">
+      <p className="text-xs text-muted">{label}</p>
+
+      <p className="text-2xl font-bold mt-2">
+        {value}
+      </p>
     </div>
   );
 }
