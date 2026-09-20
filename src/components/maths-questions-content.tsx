@@ -692,7 +692,7 @@ function SelectionScreen({
         </div>
       </div>
 
-      {historyCount > 0 && (
+    
         <div className="grid sm:grid-cols-3 gap-4">
           <button
             onClick={onProgress}
@@ -751,7 +751,7 @@ function SelectionScreen({
             </div>
           </button>
         </div>
-      )}
+      
 
       {weakestSkill && (
         <div className="dashboard-card border-primary/30 bg-primary/5">
